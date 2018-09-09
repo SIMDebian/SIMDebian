@@ -18,3 +18,17 @@ Alternatively, the `simd` mark can be replaced by specific ISA names e.g. `avx`,
 ## Benchmakrs
 
 To proof this project is useful we need some benchmark data.
+
+## Core Packages
+
+#### Development
+
+* Dpkg https://github.com/SIMDebian/dpkg/tree/simd
+
+We forked dpkg to add SIMD buildflag support. With the patched dpkg, one just need to rebuild the debian
+package with the following change:
+
+```diff
+-export DEB_BUILD_MAINT_OPTIONS  = hardening=+all
++export DEB_BUILD_MAINT_OPTIONS  = hardening=+all simd=+haswell
+```
