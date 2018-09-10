@@ -8,497 +8,13 @@ to bring performance boost.
 The exception is when TF is built against MKL, MKL is able to
 dynamically select code according to the CPU.
 
-# [ppc64el/CPU] generic code / native code, benchmarking with inceptionv5
-
-Source
-> https://salsa.debian.org/science-team/tensorflow
-> b7252d13d59ebecae7928daa25af3a5ab1289bae
-
-Machine (osuosl)
-> Architecture:          ppc64le
-> Byte Order:            Little Endian
-> CPU(s):                8
-> On-line CPU(s) list:   0-7
-> Thread(s) per core:    1
-> Core(s) per socket:    1
-> Socket(s):             8
-> NUMA node(s):          1
-> Model:                 2.1 (pvr 004b 0201)
-> Model name:            POWER8 (architected), altivec supported
-> Hypervisor vendor:     KVM
-> Virtualization type:   para
-> L1d cache:             64K
-> L1i cache:             32K
-> NUMA node0 CPU(s):     0-7
-
-Source changes
-```
-diff --git a/debian/rules b/debian/rules
-index 53b186ef..130196c6 100755
---- a/debian/rules
-+++ b/debian/rules
-@@ -1,7 +1,7 @@
- #!/usr/bin/make -f
- export DEB_BUILD_MAINT_OPTIONS = hardening=+all
- export DEB_CFLAGS_MAINT_APPEND =
--export DEB_CXXFLAGS_MAINT_APPEND =
-+export DEB_CXXFLAGS_MAINT_APPEND = -mcpu=native
- # XXX: Warning: -Wl,--as-needed will trigger FTBFS!!
- export DEB_LDFLAGS_MAINT_APPEND =
-```
-
-Generic result
-```
-(sid)debian@debian-1:~/tensorflow.pkg/tensorflow$ ./tf_benchmark_model --graph=../tensorflow_inception_graph.pb
-2018-09-10 12:36:15.624324: I tensorflow/tools/benchmark/benchmark_model.cc:469] Graph: [../tensorflow_inception_graph.pb]
-2018-09-10 12:36:15.624416: I tensorflow/tools/benchmark/benchmark_model.cc:470] Init ops:
-2018-09-10 12:36:15.624426: I tensorflow/tools/benchmark/benchmark_model.cc:471] Input layers: [input:0]
-2018-09-10 12:36:15.624440: I tensorflow/tools/benchmark/benchmark_model.cc:472] Input shapes: [1,224,224,3]
-2018-09-10 12:36:15.624450: I tensorflow/tools/benchmark/benchmark_model.cc:473] Input types: [float]
-2018-09-10 12:36:15.624461: I tensorflow/tools/benchmark/benchmark_model.cc:474] Output layers: [output:0]
-2018-09-10 12:36:15.624471: I tensorflow/tools/benchmark/benchmark_model.cc:475] Target layers: []
-2018-09-10 12:36:15.624487: I tensorflow/tools/benchmark/benchmark_model.cc:476] Num runs: [1000]
-2018-09-10 12:36:15.624496: I tensorflow/tools/benchmark/benchmark_model.cc:477] Inter-inference delay (seconds): [-1.0]
-2018-09-10 12:36:15.624506: I tensorflow/tools/benchmark/benchmark_model.cc:478] Inter-benchmark delay (seconds): [-1.0]
-2018-09-10 12:36:15.624515: I tensorflow/tools/benchmark/benchmark_model.cc:480] Num threads: [-1]
-2018-09-10 12:36:15.624525: I tensorflow/tools/benchmark/benchmark_model.cc:481] Benchmark name: []
-2018-09-10 12:36:15.624537: I tensorflow/tools/benchmark/benchmark_model.cc:482] Output prefix: []
-2018-09-10 12:36:15.624547: I tensorflow/tools/benchmark/benchmark_model.cc:483] Show sizes: [0]
-2018-09-10 12:36:15.624556: I tensorflow/tools/benchmark/benchmark_model.cc:484] Warmup runs: [1]
-2018-09-10 12:36:15.624567: I tensorflow/tools/benchmark/benchmark_model.cc:251] Loading TensorFlow.
-2018-09-10 12:36:15.624595: I tensorflow/tools/benchmark/benchmark_model.cc:258] Got config, 0 devices
-2018-09-10 12:36:15.716408: I tensorflow/tools/benchmark/benchmark_model.cc:496] Initialized session in 0.091787s
-2018-09-10 12:36:15.716535: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1 iterations, max -1 seconds without detailed stat logging, with -1s sleep between inferences
-2018-09-10 12:36:16.052434: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=1 curr=335337
-
-2018-09-10 12:36:16.052583: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1000 iterations, max 10 seconds without detailed stat logging, with -1s sleep between inferences
-2018-09-10 12:36:26.109025: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=424 first=27363 curr=21886 min=20873 max=29838 avg=23601.1 std=1660
-
-2018-09-10 12:36:26.109144: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1000 iterations, max 10 seconds with detailed stat logging, with -1s sleep between inferences
-2018-09-10 12:36:37.571102: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=405 first=27236 curr=23132 min=21351 max=37195 avg=24724.8 std=1940
-
-2018-09-10 12:36:37.571200: I tensorflow/tools/benchmark/benchmark_model.cc:600] Average inference timings in us: Warmup: 335337, no stats: 23601, with stats: 24724
-2018-09-10 12:36:37.574153: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Run Order ==============================
-2018-09-10 12:36:37.574169: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
-2018-09-10 12:36:37.574184: I tensorflow/core/util/stat_summarizer.cc:85] 	                    NoOp	    0.000	    0.011	    0.011	  0.000%	  0.000%	     0.000	        0	_SOURCE
-2018-09-10 12:36:37.574198: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.055	    0.030	    0.030	  0.000%	  0.000%	     0.000	        0	mixed4a_1x1_w
-2018-09-10 12:36:37.574212: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.088	    0.005	    0.005	  0.000%	  0.000%	     0.000	        0	mixed4a_1x1_b
-2018-09-10 12:36:37.574233: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.095	    0.007	    0.007	  0.000%	  0.000%	     0.000	        0	mixed4a_3x3_bottleneck_w
-2018-09-10 12:36:37.574245: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.104	    0.004	    0.004	  0.000%	  0.000%	     0.000	        0	mixed4a_3x3_bottleneck_b
-2018-09-10 12:36:37.574259: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.110	    0.006	    0.006	  0.000%	  0.000%	     0.000	        0	mixed4a_3x3_w
-2018-09-10 12:36:37.574273: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.118	    0.004	    0.004	  0.000%	  0.000%	     0.000	        0	mixed4a_3x3_b
-2018-09-10 12:36:37.574285: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.124	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed4a_5x5_bottleneck_w
-2018-09-10 12:36:37.574299: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.130	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed4a_5x5_bottleneck_b
-2018-09-10 12:36:37.574313: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.136	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed4a_5x5_w
-2018-09-10 12:36:37.574327: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.143	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed4a_5x5_b
-2018-09-10 12:36:37.574339: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.149	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3b_1x1_w
-2018-09-10 12:36:37.574353: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.156	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3b_1x1_b
-2018-09-10 12:36:37.574366: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.162	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3b_3x3_bottleneck_w
-2018-09-10 12:36:37.574377: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.168	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3b_3x3_bottleneck_b
-2018-09-10 12:36:37.574391: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.174	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3b_3x3_w
-2018-09-10 12:36:37.574404: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.180	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3b_3x3_b
-2018-09-10 12:36:37.574418: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.186	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3b_5x5_bottleneck_w
-2018-09-10 12:36:37.574430: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.193	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3b_5x5_bottleneck_b
-2018-09-10 12:36:37.574444: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.198	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3b_5x5_w
-2018-09-10 12:36:37.574457: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.205	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3b_5x5_b
-2018-09-10 12:36:37.574471: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.211	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed4a/concat_dim
-2018-09-10 12:36:37.574484: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.216	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3a_1x1_w
-2018-09-10 12:36:37.574498: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.223	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3a_1x1_b
-2018-09-10 12:36:37.574511: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.229	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3a_3x3_bottleneck_w
-2018-09-10 12:36:37.574525: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.235	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3a_3x3_bottleneck_b
-2018-09-10 12:36:37.574539: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.241	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3a_3x3_w
-2018-09-10 12:36:37.574553: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.248	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3a_3x3_b
-2018-09-10 12:36:37.574566: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.254	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3a_5x5_bottleneck_w
-2018-09-10 12:36:37.574580: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.260	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3a_5x5_bottleneck_b
-2018-09-10 12:36:37.574592: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.266	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3a_5x5_w
-2018-09-10 12:36:37.574606: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.273	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	mixed3a_5x5_b
-2018-09-10 12:36:37.574619: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.279	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	conv2d0_w
-2018-09-10 12:36:37.574633: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.285	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	conv2d0_b
-2018-09-10 12:36:37.574647: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.291	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	conv2d1_w
-2018-09-10 12:36:37.574660: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.298	    0.003	    0.003	  0.000%	  0.001%	     0.000	        0	conv2d1_b
-2018-09-10 12:36:37.574674: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.303	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	conv2d2_w
-2018-09-10 12:36:37.574687: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.309	    0.004	    0.004	  0.000%	  0.001%	     0.000	        0	conv2d2_b
-2018-09-10 12:36:37.574702: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.315	    0.005	    0.005	  0.000%	  0.001%	     0.000	        0	mixed3a_pool_reduce_w
-2018-09-10 12:36:37.574716: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.321	    0.004	    0.004	  0.000%	  0.002%	     0.000	        0	mixed3a_pool_reduce_b
-2018-09-10 12:36:37.574729: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.327	    0.005	    0.005	  0.000%	  0.002%	     0.000	        0	mixed3b_pool_reduce_w
-2018-09-10 12:36:37.574743: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.333	    0.005	    0.005	  0.000%	  0.002%	     0.000	        0	mixed3b_pool_reduce_b
-2018-09-10 12:36:37.574757: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.339	    0.005	    0.005	  0.000%	  0.002%	     0.000	        0	mixed4a_pool_reduce_w
-2018-09-10 12:36:37.574771: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.346	    0.004	    0.004	  0.000%	  0.002%	     0.000	        0	mixed4a_pool_reduce_b
-2018-09-10 12:36:37.574785: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.352	    0.004	    0.004	  0.000%	  0.002%	     0.000	        0	head0_bottleneck_w
-2018-09-10 12:36:37.574799: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.358	    0.004	    0.004	  0.000%	  0.002%	     0.000	        0	head0_bottleneck_b
-2018-09-10 12:36:37.574817: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.364	    0.004	    0.004	  0.000%	  0.002%	     0.000	        0	head0_bottleneck/reshape/shape
-2018-09-10 12:36:37.574831: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.370	    0.004	    0.004	  0.000%	  0.002%	     0.000	        0	nn0_w
-2018-09-10 12:36:37.574845: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.375	    0.005	    0.005	  0.000%	  0.002%	     0.000	        0	nn0_b
-2018-09-10 12:36:37.574859: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.381	    0.005	    0.005	  0.000%	  0.002%	     0.000	        0	softmax0_w
-2018-09-10 12:36:37.574873: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.387	    0.005	    0.005	  0.000%	  0.002%	     0.000	        0	softmax0_b
-2018-09-10 12:36:37.574887: I tensorflow/core/util/stat_summarizer.cc:85] 	                    _Arg	    0.393	    0.006	    0.006	  0.000%	  0.002%	     0.000	        0	_arg_input_0_0
-2018-09-10 12:36:37.574899: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.401	    3.169	    3.169	  0.023%	  0.025%	  3211.264	        0	conv2d0_pre_relu/conv
-2018-09-10 12:36:37.574912: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	    3.590	    0.168	    0.168	  0.001%	  0.026%	     0.000	        0	conv2d0_pre_relu
-2018-09-10 12:36:37.574926: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	    3.761	    0.150	    0.150	  0.001%	  0.027%	     0.000	        0	conv2d0
-2018-09-10 12:36:37.574940: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	    3.913	    1.243	    1.243	  0.009%	  0.036%	   802.816	        0	maxpool0
-2018-09-10 12:36:37.574953: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	    5.162	    0.424	    0.424	  0.003%	  0.039%	   802.816	        0	localresponsenorm0
-2018-09-10 12:36:37.574967: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    5.590	    0.252	    0.252	  0.002%	  0.041%	   802.816	        0	conv2d1_pre_relu/conv
-2018-09-10 12:36:37.574981: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	    5.847	    0.104	    0.104	  0.001%	  0.041%	     0.000	        0	conv2d1_pre_relu
-2018-09-10 12:36:37.574995: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	    5.954	    0.090	    0.090	  0.001%	  0.042%	     0.000	        0	conv2d1
-2018-09-10 12:36:37.575007: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    6.047	    5.722	    5.722	  0.041%	  0.083%	  2408.448	        0	conv2d2_pre_relu/conv
-2018-09-10 12:36:37.575020: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   11.775	    0.157	    0.157	  0.001%	  0.084%	     0.000	        0	conv2d2_pre_relu
-2018-09-10 12:36:37.575034: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   11.935	    0.119	    0.119	  0.001%	  0.085%	     0.000	        0	conv2d2
-2018-09-10 12:36:37.575048: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	   12.057	    1.754	    1.754	  0.013%	  0.098%	  2408.448	        0	localresponsenorm1
-2018-09-10 12:36:37.575061: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   13.815	    0.652	    0.652	  0.005%	  0.102%	   602.112	        0	maxpool1
-2018-09-10 12:36:37.575075: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   14.512	    0.469	    0.469	  0.003%	  0.106%	    50.176	        0	mixed3a_5x5_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.575089: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   14.508	    0.477	    0.477	  0.003%	  0.109%	   200.704	        0	mixed3a_1x1_pre_relu/conv
-2018-09-10 12:36:37.575103: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   14.996	    0.027	    0.027	  0.000%	  0.109%	     0.000	        0	mixed3a_5x5_bottleneck_pre_relu
-2018-09-10 12:36:37.575116: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   15.027	    0.015	    0.015	  0.000%	  0.109%	     0.000	        0	mixed3a_5x5_bottleneck
-2018-09-10 12:36:37.575131: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   15.001	    0.056	    0.056	  0.000%	  0.110%	     0.000	        0	mixed3a_1x1_pre_relu
-2018-09-10 12:36:37.575145: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   14.490	    0.589	    0.589	  0.004%	  0.114%	   602.112	        0	mixed3a_pool
-2018-09-10 12:36:37.575158: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   15.060	    0.037	    0.037	  0.000%	  0.114%	     0.000	        0	mixed3a_1x1
-2018-09-10 12:36:37.575172: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   14.507	    0.678	    0.678	  0.005%	  0.119%	   301.056	        0	mixed3a_3x3_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.575186: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   15.201	    0.088	    0.088	  0.001%	  0.120%	     0.000	        0	mixed3a_3x3_bottleneck_pre_relu
-2018-09-10 12:36:37.575200: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   15.293	    0.053	    0.053	  0.000%	  0.120%	     0.000	        0	mixed3a_3x3_bottleneck
-2018-09-10 12:36:37.575214: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   15.045	    0.385	    0.385	  0.003%	  0.123%	   100.352	        0	mixed3a_5x5_pre_relu/conv
-2018-09-10 12:36:37.575227: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   15.085	    0.378	    0.378	  0.003%	  0.126%	   100.352	        0	mixed3a_pool_reduce_pre_relu/conv
-2018-09-10 12:36:37.575241: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   15.444	    0.036	    0.036	  0.000%	  0.126%	     0.000	        0	mixed3a_5x5_pre_relu
-2018-09-10 12:36:37.575255: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   15.466	    0.034	    0.034	  0.000%	  0.126%	     0.000	        0	mixed3a_pool_reduce_pre_relu
-2018-09-10 12:36:37.575270: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   15.483	    0.020	    0.020	  0.000%	  0.126%	     0.000	        0	mixed3a_5x5
-2018-09-10 12:36:37.575283: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   15.503	    0.021	    0.021	  0.000%	  0.126%	     0.000	        0	mixed3a_pool_reduce
-2018-09-10 12:36:37.575297: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   15.349	    1.548	    1.548	  0.011%	  0.138%	   401.408	        0	mixed3a_3x3_pre_relu/conv
-2018-09-10 12:36:37.575311: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   16.903	    0.110	    0.110	  0.001%	  0.138%	     0.000	        0	mixed3a_3x3_pre_relu
-2018-09-10 12:36:37.575324: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   17.016	    0.088	    0.088	  0.001%	  0.139%	     0.000	        0	mixed3a_3x3
-2018-09-10 12:36:37.575338: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   17.107	    0.116	    0.116	  0.001%	  0.140%	   802.816	        0	mixed3a
-2018-09-10 12:36:37.575351: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   17.243	    0.709	    0.709	  0.005%	  0.145%	   802.816	        0	mixed3b_pool
-2018-09-10 12:36:37.575365: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.263	    0.799	    0.799	  0.006%	  0.151%	   100.352	        0	mixed3b_5x5_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.575379: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   18.066	    0.031	    0.031	  0.000%	  0.151%	     0.000	        0	mixed3b_5x5_bottleneck_pre_relu
-2018-09-10 12:36:37.575394: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   18.100	    0.021	    0.021	  0.000%	  0.151%	     0.000	        0	mixed3b_5x5_bottleneck
-2018-09-10 12:36:37.575408: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.252	    1.202	    1.202	  0.009%	  0.160%	   401.408	        0	mixed3b_1x1_pre_relu/conv
-2018-09-10 12:36:37.575421: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.260	    1.202	    1.202	  0.009%	  0.168%	   401.408	        0	mixed3b_3x3_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.575435: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.957	    0.568	    0.568	  0.004%	  0.172%	   200.704	        0	mixed3b_pool_reduce_pre_relu/conv
-2018-09-10 12:36:37.575449: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   18.531	    0.058	    0.058	  0.000%	  0.173%	     0.000	        0	mixed3b_pool_reduce_pre_relu
-2018-09-10 12:36:37.575463: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   18.468	    0.126	    0.126	  0.001%	  0.174%	     0.000	        0	mixed3b_3x3_bottleneck_pre_relu
-2018-09-10 12:36:37.575477: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   18.464	    0.156	    0.156	  0.001%	  0.175%	     0.000	        0	mixed3b_1x1_pre_relu
-2018-09-10 12:36:37.575490: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   18.592	    0.036	    0.036	  0.000%	  0.175%	     0.000	        0	mixed3b_pool_reduce
-2018-09-10 12:36:37.575504: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   18.624	    0.087	    0.087	  0.001%	  0.176%	     0.000	        0	mixed3b_1x1
-2018-09-10 12:36:37.575518: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   18.597	    0.139	    0.139	  0.001%	  0.177%	     0.000	        0	mixed3b_3x3_bottleneck
-2018-09-10 12:36:37.575532: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   18.124	    3.472	    3.472	  0.025%	  0.202%	   301.056	        0	mixed3b_5x5_pre_relu/conv
-2018-09-10 12:36:37.575545: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   21.604	    0.083	    0.083	  0.001%	  0.202%	     0.000	        0	mixed3b_5x5_pre_relu
-2018-09-10 12:36:37.575559: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   21.690	    0.051	    0.051	  0.000%	  0.203%	     0.000	        0	mixed3b_5x5
-2018-09-10 12:36:37.575573: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   18.739	    4.069	    4.069	  0.029%	  0.232%	   602.112	        0	mixed3b_3x3_pre_relu/conv
-2018-09-10 12:36:37.575586: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   22.823	    0.115	    0.115	  0.001%	  0.233%	     0.000	        0	mixed3b_3x3_pre_relu
-2018-09-10 12:36:37.575599: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   22.941	    0.379	    0.379	  0.003%	  0.235%	     0.000	        0	mixed3b_3x3
-2018-09-10 12:36:37.575613: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   23.325	    0.187	    0.187	  0.001%	  0.237%	  1505.280	        0	mixed3b
-2018-09-10 12:36:37.575626: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   23.518	    0.378	    0.378	  0.003%	  0.239%	   376.320	        0	maxpool4
-2018-09-10 12:36:37.575640: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   23.931	    0.217	    0.217	  0.002%	  0.241%	    12.544	        0	mixed4a_5x5_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.575654: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   24.152	    0.009	    0.009	  0.000%	  0.241%	     0.000	        0	mixed4a_5x5_bottleneck_pre_relu
-2018-09-10 12:36:37.575667: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   24.164	    0.006	    0.006	  0.000%	  0.241%	     0.000	        0	mixed4a_5x5_bottleneck
-2018-09-10 12:36:37.575681: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   23.916	    0.306	    0.306	  0.002%	  0.243%	   376.320	        0	mixed4a_pool
-2018-09-10 12:36:37.575696: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   23.932	    0.464	    0.464	  0.003%	  0.247%	    75.264	        0	mixed4a_3x3_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.575708: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   24.400	    0.028	    0.028	  0.000%	  0.247%	     0.000	        0	mixed4a_3x3_bottleneck_pre_relu
-2018-09-10 12:36:37.575722: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   24.431	    0.017	    0.017	  0.000%	  0.247%	     0.000	        0	mixed4a_3x3_bottleneck
-2018-09-10 12:36:37.575736: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   23.927	    0.563	    0.563	  0.004%	  0.251%	   150.528	        0	mixed4a_1x1_pre_relu/conv
-2018-09-10 12:36:37.575749: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   24.172	    0.329	    0.329	  0.002%	  0.253%	    37.632	        0	mixed4a_5x5_pre_relu/conv
-2018-09-10 12:36:37.575763: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   24.505	    0.016	    0.016	  0.000%	  0.253%	     0.000	        0	mixed4a_5x5_pre_relu
-2018-09-10 12:36:37.575777: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   24.523	    0.015	    0.015	  0.000%	  0.253%	     0.000	        0	mixed4a_5x5
-2018-09-10 12:36:37.575790: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   24.495	    0.046	    0.046	  0.000%	  0.254%	     0.000	        0	mixed4a_1x1_pre_relu
-2018-09-10 12:36:37.575802: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   24.544	    0.029	    0.029	  0.000%	  0.254%	     0.000	        0	mixed4a_1x1
-2018-09-10 12:36:37.575816: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   24.226	    0.397	    0.397	  0.003%	  0.257%	    50.176	        0	mixed4a_pool_reduce_pre_relu/conv
-2018-09-10 12:36:37.575830: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   24.627	    0.020	    0.020	  0.000%	  0.257%	     0.000	        0	mixed4a_pool_reduce_pre_relu
-2018-09-10 12:36:37.575844: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   24.649	    0.013	    0.013	  0.000%	  0.257%	     0.000	        0	mixed4a_pool_reduce
-2018-09-10 12:36:37.575858: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   24.450	    0.701	    0.701	  0.005%	  0.262%	   159.936	        0	mixed4a_3x3_pre_relu/conv
-2018-09-10 12:36:37.575871: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   25.162	    0.044	    0.044	  0.000%	  0.262%	     0.000	        0	mixed4a_3x3_pre_relu
-2018-09-10 12:36:37.575885: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   25.209	    0.029	    0.029	  0.000%	  0.263%	     0.000	        0	mixed4a_3x3
-2018-09-10 12:36:37.575898: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   25.240	    0.102	    0.102	  0.001%	  0.263%	   398.272	        0	mixed4a
-2018-09-10 12:36:37.575911: I tensorflow/core/util/stat_summarizer.cc:85] 	                 AvgPool	   25.347	    0.124	    0.124	  0.001%	  0.264%	    32.512	        0	head0_pool
-2018-09-10 12:36:37.575924: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   25.474	    0.135	    0.135	  0.001%	  0.265%	     8.192	        0	head0_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.575938: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   25.612	    0.008	    0.008	  0.000%	  0.265%	     0.000	        0	head0_bottleneck_pre_relu
-2018-09-10 12:36:37.575952: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   25.625	    0.005	    0.005	  0.000%	  0.265%	     0.000	        0	head0_bottleneck
-2018-09-10 12:36:37.575966: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Reshape	   25.633	    0.006	    0.006	  0.000%	  0.265%	     0.000	        0	head0_bottleneck/reshape
-2018-09-10 12:36:37.575979: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	   25.641	    0.754	    0.754	  0.005%	  0.271%	     4.096	        0	nn0_pre_relu/matmul
-2018-09-10 12:36:37.575994: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   26.404	    0.018	    0.018	  0.000%	  0.271%	     0.000	        0	nn0_pre_relu
-2018-09-10 12:36:37.576007: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   26.424	    0.005	    0.005	  0.000%	  0.271%	     0.000	        0	nn0
-2018-09-10 12:36:37.576021: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	   26.431	    0.391	    0.391	  0.003%	  0.274%	     4.032	        0	softmax0_pre_activation/matmul
-2018-09-10 12:36:37.576035: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   26.825	    0.007	    0.007	  0.000%	  0.274%	     0.000	        0	softmax0_pre_activation
-2018-09-10 12:36:37.576049: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Softmax	   26.834	    0.027	    0.027	  0.000%	  0.274%	     0.000	        0	softmax0
-2018-09-10 12:36:37.576062: I tensorflow/core/util/stat_summarizer.cc:85] 	                Identity	   26.863	    0.005	    0.005	  0.000%	  0.274%	     0.000	        0	output
-2018-09-10 12:36:37.576075: I tensorflow/core/util/stat_summarizer.cc:85] 	                 _Retval	   26.870	    0.011	    0.011	  0.000%	  0.274%	     0.000	        0	_retval_output_0_0
-2018-09-10 12:36:37.576088: I tensorflow/core/util/stat_summarizer.cc:85] 
-2018-09-10 12:36:37.576099: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Top by Computation Time ==============================
-2018-09-10 12:36:37.576111: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
-2018-09-10 12:36:37.576127: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    6.047	    5.722	    5.722	  0.041%	  0.041%	  2408.448	        0	conv2d2_pre_relu/conv
-2018-09-10 12:36:37.576141: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   18.739	    4.069	    4.069	  0.029%	  0.070%	   602.112	        0	mixed3b_3x3_pre_relu/conv
-2018-09-10 12:36:37.576160: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   18.124	    3.472	    3.472	  0.025%	  0.095%	   301.056	        0	mixed3b_5x5_pre_relu/conv
-2018-09-10 12:36:37.576174: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.401	    3.169	    3.169	  0.023%	  0.118%	  3211.264	        0	conv2d0_pre_relu/conv
-2018-09-10 12:36:37.576188: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	   12.057	    1.754	    1.754	  0.013%	  0.130%	  2408.448	        0	localresponsenorm1
-2018-09-10 12:36:37.576202: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   15.349	    1.548	    1.548	  0.011%	  0.142%	   401.408	        0	mixed3a_3x3_pre_relu/conv
-2018-09-10 12:36:37.576216: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	    3.913	    1.243	    1.243	  0.009%	  0.150%	   802.816	        0	maxpool0
-2018-09-10 12:36:37.576229: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.260	    1.202	    1.202	  0.009%	  0.159%	   401.408	        0	mixed3b_3x3_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.576243: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.252	    1.202	    1.202	  0.009%	  0.168%	   401.408	        0	mixed3b_1x1_pre_relu/conv
-2018-09-10 12:36:37.576258: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.263	    0.799	    0.799	  0.006%	  0.173%	   100.352	        0	mixed3b_5x5_bottleneck_pre_relu/conv
-2018-09-10 12:36:37.576271: I tensorflow/core/util/stat_summarizer.cc:85] 
-2018-09-10 12:36:37.576282: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Top by Memory Use ==============================
-2018-09-10 12:36:37.576328: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
-2018-09-10 12:36:37.576343: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.401	    3.169	    3.169	  0.023%	  0.023%	  3211.264	        0	conv2d0_pre_relu/conv
-2018-09-10 12:36:37.576357: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    6.047	    5.722	    5.722	  0.041%	  0.064%	  2408.448	        0	conv2d2_pre_relu/conv
-2018-09-10 12:36:37.576371: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	   12.057	    1.754	    1.754	  0.013%	  0.076%	  2408.448	        0	localresponsenorm1
-2018-09-10 12:36:37.576385: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   23.325	    0.187	    0.187	  0.001%	  0.078%	  1505.280	        0	mixed3b
-2018-09-10 12:36:37.576398: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   17.243	    0.709	    0.709	  0.005%	  0.083%	   802.816	        0	mixed3b_pool
-2018-09-10 12:36:37.576412: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   17.107	    0.116	    0.116	  0.001%	  0.084%	   802.816	        0	mixed3a
-2018-09-10 12:36:37.576426: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    5.590	    0.252	    0.252	  0.002%	  0.085%	   802.816	        0	conv2d1_pre_relu/conv
-2018-09-10 12:36:37.576440: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	    5.162	    0.424	    0.424	  0.003%	  0.088%	   802.816	        0	localresponsenorm0
-2018-09-10 12:36:37.576459: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	    3.913	    1.243	    1.243	  0.009%	  0.097%	   802.816	        0	maxpool0
-2018-09-10 12:36:37.576473: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   13.815	    0.652	    0.652	  0.005%	  0.102%	   602.112	        0	maxpool1
-2018-09-10 12:36:37.576487: I tensorflow/core/util/stat_summarizer.cc:85] 
-2018-09-10 12:36:37.576497: I tensorflow/core/util/stat_summarizer.cc:85] Number of nodes executed: 139
-2018-09-10 12:36:37.576507: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Summary by node type ==============================
-2018-09-10 12:36:37.576518: I tensorflow/core/util/stat_summarizer.cc:85] 	             [Node type]	  [count]	  [avg ms]	    [avg %]	    [cdf %]	  [mem KB]	[times called]
-2018-09-10 12:36:37.576531: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	       22	     0.054	    81.818%	    81.818%	 10077.888	        0
-2018-09-10 12:36:37.576545: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	        6	     0.006	     9.091%	    90.909%	  3562.496	        0
-2018-09-10 12:36:37.576558: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	        2	     0.005	     7.576%	    98.485%	  3211.264	        0
-2018-09-10 12:36:37.576571: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	        2	     0.001	     1.515%	   100.000%	     8.128	        0
-2018-09-10 12:36:37.576584: I tensorflow/core/util/stat_summarizer.cc:85] 	                 _Retval	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576598: I tensorflow/core/util/stat_summarizer.cc:85] 	                    _Arg	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576611: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Softmax	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576624: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Reshape	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576637: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	       23	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576650: I tensorflow/core/util/stat_summarizer.cc:85] 	                    NoOp	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576663: I tensorflow/core/util/stat_summarizer.cc:85] 	                Identity	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576677: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	       50	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576690: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	        3	     0.000	     0.000%	   100.000%	  2706.368	        0
-2018-09-10 12:36:37.576704: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	       24	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 12:36:37.576717: I tensorflow/core/util/stat_summarizer.cc:85] 	                 AvgPool	        1	     0.000	     0.000%	   100.000%	    32.512	        0
-2018-09-10 12:36:37.576728: I tensorflow/core/util/stat_summarizer.cc:85] 
-2018-09-10 12:36:37.576738: I tensorflow/core/util/stat_summarizer.cc:85] Timings (microseconds): count=405 first=38212 curr=31864 min=29642 max=45766 avg=34421.5 std=2685
-2018-09-10 12:36:37.576750: I tensorflow/core/util/stat_summarizer.cc:85] Memory (bytes): count=405 curr=19598656(all same)
-2018-09-10 12:36:37.576760: I tensorflow/core/util/stat_summarizer.cc:85] 139 nodes observed
-2018-09-10 12:36:37.576770: I tensorflow/core/util/stat_summarizer.cc:85] 
-```
-
-mcpu=native
-```
-(sid)debian@debian-1:~/tensorflow.pkg/tensorflow$ ./tf_benchmark_model --graph=../tensorflow_inception_graph.pb
-2018-09-10 13:58:01.996479: I tensorflow/tools/benchmark/benchmark_model.cc:469] Graph: [../tensorflow_inception_graph.pb]
-2018-09-10 13:58:01.996594: I tensorflow/tools/benchmark/benchmark_model.cc:470] Init ops:
-2018-09-10 13:58:01.996605: I tensorflow/tools/benchmark/benchmark_model.cc:471] Input layers: [input:0]
-2018-09-10 13:58:01.996614: I tensorflow/tools/benchmark/benchmark_model.cc:472] Input shapes: [1,224,224,3]
-2018-09-10 13:58:01.996623: I tensorflow/tools/benchmark/benchmark_model.cc:473] Input types: [float]
-2018-09-10 13:58:01.996632: I tensorflow/tools/benchmark/benchmark_model.cc:474] Output layers: [output:0]
-2018-09-10 13:58:01.996641: I tensorflow/tools/benchmark/benchmark_model.cc:475] Target layers: []
-2018-09-10 13:58:01.996657: I tensorflow/tools/benchmark/benchmark_model.cc:476] Num runs: [1000]
-2018-09-10 13:58:01.996666: I tensorflow/tools/benchmark/benchmark_model.cc:477] Inter-inference delay (seconds): [-1.0]
-2018-09-10 13:58:01.996676: I tensorflow/tools/benchmark/benchmark_model.cc:478] Inter-benchmark delay (seconds): [-1.0]
-2018-09-10 13:58:01.996685: I tensorflow/tools/benchmark/benchmark_model.cc:480] Num threads: [-1]
-2018-09-10 13:58:01.996697: I tensorflow/tools/benchmark/benchmark_model.cc:481] Benchmark name: []
-2018-09-10 13:58:01.996706: I tensorflow/tools/benchmark/benchmark_model.cc:482] Output prefix: []
-2018-09-10 13:58:01.996717: I tensorflow/tools/benchmark/benchmark_model.cc:483] Show sizes: [0]
-2018-09-10 13:58:01.996726: I tensorflow/tools/benchmark/benchmark_model.cc:484] Warmup runs: [1]
-2018-09-10 13:58:01.996736: I tensorflow/tools/benchmark/benchmark_model.cc:251] Loading TensorFlow.
-2018-09-10 13:58:01.996772: I tensorflow/tools/benchmark/benchmark_model.cc:258] Got config, 0 devices
-2018-09-10 13:58:02.112598: I tensorflow/tools/benchmark/benchmark_model.cc:496] Initialized session in 0.11578s
-2018-09-10 13:58:02.112822: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1 iterations, max -1 seconds without detailed stat logging, with -1s sleep between inferences
-2018-09-10 13:58:02.677115: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=1 curr=563711
-
-2018-09-10 13:58:02.677315: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1000 iterations, max 10 seconds without detailed stat logging, with -1s sleep between inferences
-2018-09-10 13:58:12.805872: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=61 first=148120 curr=142851 min=98477 max=460913 avg=165887 std=57460
-
-2018-09-10 13:58:12.806099: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1000 iterations, max 10 seconds with detailed stat logging, with -1s sleep between inferences
-2018-09-10 13:58:23.177830: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=73 first=142506 curr=131035 min=76080 max=231098 avg=137022 std=35646
-
-2018-09-10 13:58:23.178023: I tensorflow/tools/benchmark/benchmark_model.cc:600] Average inference timings in us: Warmup: 563711, no stats: 165886, with stats: 137022
-2018-09-10 13:58:23.182080: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Run Order ==============================
-2018-09-10 13:58:23.182097: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
-2018-09-10 13:58:23.182111: I tensorflow/core/util/stat_summarizer.cc:85] 	                    NoOp	    0.000	    0.013	    0.013	  0.000%	  0.000%	     0.000	        0	_SOURCE
-2018-09-10 13:58:23.182123: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.042	    0.041	    0.041	  0.000%	  0.000%	     0.000	        0	mixed4a_1x1_w
-2018-09-10 13:58:23.182135: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.086	    0.008	    0.008	  0.000%	  0.001%	     0.000	        0	mixed4a_1x1_b
-2018-09-10 13:58:23.182147: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.096	    0.008	    0.008	  0.000%	  0.001%	     0.000	        0	mixed4a_3x3_bottleneck_w
-2018-09-10 13:58:23.182159: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.107	    0.007	    0.007	  0.000%	  0.001%	     0.000	        0	mixed4a_3x3_bottleneck_b
-2018-09-10 13:58:23.182171: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.117	    0.008	    0.008	  0.000%	  0.001%	     0.000	        0	mixed4a_3x3_w
-2018-09-10 13:58:23.182184: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.127	    0.006	    0.006	  0.000%	  0.001%	     0.000	        0	mixed4a_3x3_b
-2018-09-10 13:58:23.182196: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.135	    0.008	    0.008	  0.000%	  0.001%	     0.000	        0	mixed4a_5x5_bottleneck_w
-2018-09-10 13:58:23.182207: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.145	    0.007	    0.007	  0.000%	  0.001%	     0.000	        0	mixed4a_5x5_bottleneck_b
-2018-09-10 13:58:23.182219: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.154	    0.008	    0.008	  0.000%	  0.001%	     0.000	        0	mixed4a_5x5_w
-2018-09-10 13:58:23.182231: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.164	    0.006	    0.006	  0.000%	  0.001%	     0.000	        0	mixed4a_5x5_b
-2018-09-10 13:58:23.182243: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.172	    0.008	    0.008	  0.000%	  0.001%	     0.000	        0	mixed3b_1x1_w
-2018-09-10 13:58:23.182255: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.182	    0.006	    0.006	  0.000%	  0.001%	     0.000	        0	mixed3b_1x1_b
-2018-09-10 13:58:23.182267: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.191	    0.007	    0.007	  0.000%	  0.001%	     0.000	        0	mixed3b_3x3_bottleneck_w
-2018-09-10 13:58:23.182278: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.201	    0.006	    0.006	  0.000%	  0.001%	     0.000	        0	mixed3b_3x3_bottleneck_b
-2018-09-10 13:58:23.182290: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.209	    0.007	    0.007	  0.000%	  0.001%	     0.000	        0	mixed3b_3x3_w
-2018-09-10 13:58:23.182302: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.219	    0.006	    0.006	  0.000%	  0.001%	     0.000	        0	mixed3b_3x3_b
-2018-09-10 13:58:23.182314: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.228	    0.007	    0.007	  0.000%	  0.001%	     0.000	        0	mixed3b_5x5_bottleneck_w
-2018-09-10 13:58:23.182326: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.237	    0.006	    0.006	  0.000%	  0.001%	     0.000	        0	mixed3b_5x5_bottleneck_b
-2018-09-10 13:58:23.182338: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.245	    0.008	    0.008	  0.000%	  0.001%	     0.000	        0	mixed3b_5x5_w
-2018-09-10 13:58:23.182350: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.255	    0.007	    0.007	  0.000%	  0.002%	     0.000	        0	mixed3b_5x5_b
-2018-09-10 13:58:23.182412: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.264	    0.006	    0.006	  0.000%	  0.002%	     0.000	        0	mixed4a/concat_dim
-2018-09-10 13:58:23.182425: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.273	    0.007	    0.007	  0.000%	  0.002%	     0.000	        0	mixed3a_1x1_w
-2018-09-10 13:58:23.182437: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.283	    0.006	    0.006	  0.000%	  0.002%	     0.000	        0	mixed3a_1x1_b
-2018-09-10 13:58:23.182449: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.292	    0.007	    0.007	  0.000%	  0.002%	     0.000	        0	mixed3a_3x3_bottleneck_w
-2018-09-10 13:58:23.182461: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.301	    0.007	    0.007	  0.000%	  0.002%	     0.000	        0	mixed3a_3x3_bottleneck_b
-2018-09-10 13:58:23.182473: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.311	    0.007	    0.007	  0.000%	  0.002%	     0.000	        0	mixed3a_3x3_w
-2018-09-10 13:58:23.182485: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.320	    0.007	    0.007	  0.000%	  0.002%	     0.000	        0	mixed3a_3x3_b
-2018-09-10 13:58:23.182497: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.329	    0.008	    0.008	  0.000%	  0.002%	     0.000	        0	mixed3a_5x5_bottleneck_w
-2018-09-10 13:58:23.182509: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.339	    0.006	    0.006	  0.000%	  0.002%	     0.000	        0	mixed3a_5x5_bottleneck_b
-2018-09-10 13:58:23.182521: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.348	    0.007	    0.007	  0.000%	  0.002%	     0.000	        0	mixed3a_5x5_w
-2018-09-10 13:58:23.182533: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.358	    0.006	    0.006	  0.000%	  0.002%	     0.000	        0	mixed3a_5x5_b
-2018-09-10 13:58:23.182545: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.367	    0.006	    0.006	  0.000%	  0.002%	     0.000	        0	conv2d0_w
-2018-09-10 13:58:23.182557: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.376	    0.006	    0.006	  0.000%	  0.002%	     0.000	        0	conv2d0_b
-2018-09-10 13:58:23.182569: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.385	    0.007	    0.007	  0.000%	  0.002%	     0.000	        0	conv2d1_w
-2018-09-10 13:58:23.182581: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.394	    0.006	    0.006	  0.000%	  0.002%	     0.000	        0	conv2d1_b
-2018-09-10 13:58:23.182593: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.402	    0.008	    0.008	  0.000%	  0.002%	     0.000	        0	conv2d2_w
-2018-09-10 13:58:23.182605: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.412	    0.008	    0.008	  0.000%	  0.002%	     0.000	        0	conv2d2_b
-2018-09-10 13:58:23.182622: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.422	    0.008	    0.008	  0.000%	  0.003%	     0.000	        0	mixed3a_pool_reduce_w
-2018-09-10 13:58:23.182635: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.433	    0.007	    0.007	  0.000%	  0.003%	     0.000	        0	mixed3a_pool_reduce_b
-2018-09-10 13:58:23.182649: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.442	    0.008	    0.008	  0.000%	  0.003%	     0.000	        0	mixed3b_pool_reduce_w
-2018-09-10 13:58:23.182663: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.452	    0.006	    0.006	  0.000%	  0.003%	     0.000	        0	mixed3b_pool_reduce_b
-2018-09-10 13:58:23.182678: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.461	    0.008	    0.008	  0.000%	  0.003%	     0.000	        0	mixed4a_pool_reduce_w
-2018-09-10 13:58:23.182691: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.471	    0.007	    0.007	  0.000%	  0.003%	     0.000	        0	mixed4a_pool_reduce_b
-2018-09-10 13:58:23.182707: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.481	    0.007	    0.007	  0.000%	  0.003%	     0.000	        0	head0_bottleneck_w
-2018-09-10 13:58:23.182719: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.491	    0.006	    0.006	  0.000%	  0.003%	     0.000	        0	head0_bottleneck_b
-2018-09-10 13:58:23.182732: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.499	    0.006	    0.006	  0.000%	  0.003%	     0.000	        0	head0_bottleneck/reshape/shape
-2018-09-10 13:58:23.182748: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.507	    0.007	    0.007	  0.000%	  0.003%	     0.000	        0	nn0_w
-2018-09-10 13:58:23.182761: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.517	    0.006	    0.006	  0.000%	  0.003%	     0.000	        0	nn0_b
-2018-09-10 13:58:23.182777: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.525	    0.006	    0.006	  0.000%	  0.003%	     0.000	        0	softmax0_w
-2018-09-10 13:58:23.182789: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.534	    0.006	    0.006	  0.000%	  0.003%	     0.000	        0	softmax0_b
-2018-09-10 13:58:23.182803: I tensorflow/core/util/stat_summarizer.cc:85] 	                    _Arg	    0.543	    0.006	    0.006	  0.000%	  0.003%	     0.000	        0	_arg_input_0_0
-2018-09-10 13:58:23.182818: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.552	   14.106	   14.106	  0.116%	  0.119%	  3211.264	        0	conv2d0_pre_relu/conv
-2018-09-10 13:58:23.182831: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   14.706	    3.862	    3.862	  0.032%	  0.151%	     0.000	        0	conv2d0_pre_relu
-2018-09-10 13:58:23.182847: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   18.580	    0.426	    0.426	  0.004%	  0.155%	     0.000	        0	conv2d0
-2018-09-10 13:58:23.182859: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   19.010	    2.236	    2.236	  0.018%	  0.173%	   802.816	        0	maxpool0
-2018-09-10 13:58:23.182873: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	   21.280	    2.148	    2.148	  0.018%	  0.191%	   802.816	        0	localresponsenorm0
-2018-09-10 13:58:23.182888: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   23.441	    1.133	    1.133	  0.009%	  0.200%	   802.816	        0	conv2d1_pre_relu/conv
-2018-09-10 13:58:23.182901: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   24.583	    0.298	    0.298	  0.002%	  0.203%	     0.000	        0	conv2d1_pre_relu
-2018-09-10 13:58:23.182917: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   24.887	    0.148	    0.148	  0.001%	  0.204%	     0.000	        0	conv2d1
-2018-09-10 13:58:23.182929: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   25.040	   13.580	   13.580	  0.112%	  0.316%	  2408.448	        0	conv2d2_pre_relu/conv
-2018-09-10 13:58:23.182942: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   38.671	    2.030	    2.030	  0.017%	  0.332%	     0.000	        0	conv2d2_pre_relu
-2018-09-10 13:58:23.182957: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   40.709	    0.316	    0.316	  0.003%	  0.335%	     0.000	        0	conv2d2
-2018-09-10 13:58:23.182969: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	   41.029	   15.876	   15.876	  0.131%	  0.466%	  2408.448	        0	localresponsenorm1
-2018-09-10 13:58:23.182986: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   56.996	    1.590	    1.590	  0.013%	  0.479%	   602.112	        0	maxpool1
-2018-09-10 13:58:23.182997: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   58.655	    1.585	    1.585	  0.013%	  0.492%	   602.112	        0	mixed3a_pool
-2018-09-10 13:58:23.183010: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   59.187	    1.129	    1.129	  0.009%	  0.501%	   200.704	        0	mixed3a_1x1_pre_relu/conv
-2018-09-10 13:58:23.183026: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   60.334	    0.139	    0.139	  0.001%	  0.502%	     0.000	        0	mixed3a_1x1_pre_relu
-2018-09-10 13:58:23.183038: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   60.477	    0.053	    0.053	  0.000%	  0.503%	     0.000	        0	mixed3a_1x1
-2018-09-10 13:58:23.183050: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   60.537	    1.109	    1.109	  0.009%	  0.512%	   301.056	        0	mixed3a_3x3_bottleneck_pre_relu/conv
-2018-09-10 13:58:23.183066: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   61.654	    0.195	    0.195	  0.002%	  0.513%	     0.000	        0	mixed3a_3x3_bottleneck_pre_relu
-2018-09-10 13:58:23.183078: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   61.853	    0.072	    0.072	  0.001%	  0.514%	     0.000	        0	mixed3a_3x3_bottleneck
-2018-09-10 13:58:23.183094: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   65.665	    0.691	    0.691	  0.006%	  0.520%	    50.176	        0	mixed3a_5x5_bottleneck_pre_relu/conv
-2018-09-10 13:58:23.183107: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   66.377	    0.050	    0.050	  0.000%	  0.520%	     0.000	        0	mixed3a_5x5_bottleneck_pre_relu
-2018-09-10 13:58:23.183119: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   66.431	    0.022	    0.022	  0.000%	  0.520%	     0.000	        0	mixed3a_5x5_bottleneck
-2018-09-10 13:58:23.183134: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   66.457	    2.014	    2.014	  0.017%	  0.537%	   100.352	        0	mixed3a_5x5_pre_relu/conv
-2018-09-10 13:58:23.183146: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   60.250	    8.268	    8.268	  0.068%	  0.605%	   100.352	        0	mixed3a_pool_reduce_pre_relu/conv
-2018-09-10 13:58:23.183163: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   68.478	    0.065	    0.065	  0.001%	  0.606%	     0.000	        0	mixed3a_5x5_pre_relu
-2018-09-10 13:58:23.183175: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   68.528	    0.035	    0.035	  0.000%	  0.606%	     0.000	        0	mixed3a_pool_reduce_pre_relu
-2018-09-10 13:58:23.183188: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   68.548	    0.028	    0.028	  0.000%	  0.606%	     0.000	        0	mixed3a_5x5
-2018-09-10 13:58:23.183203: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   68.567	    0.021	    0.021	  0.000%	  0.606%	     0.000	        0	mixed3a_pool_reduce
-2018-09-10 13:58:23.183215: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   61.929	   24.205	   24.205	  0.199%	  0.806%	   401.408	        0	mixed3a_3x3_pre_relu/conv
-2018-09-10 13:58:23.183227: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   86.175	    0.243	    0.243	  0.002%	  0.808%	     0.000	        0	mixed3a_3x3_pre_relu
-2018-09-10 13:58:23.183242: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   86.424	    0.128	    0.128	  0.001%	  0.809%	     0.000	        0	mixed3a_3x3
-2018-09-10 13:58:23.183254: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   86.557	    0.271	    0.271	  0.002%	  0.811%	   802.816	        0	mixed3a
-2018-09-10 13:58:23.183270: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   86.885	    1.651	    1.651	  0.014%	  0.824%	   802.816	        0	mixed3b_pool
-2018-09-10 13:58:23.183282: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   88.545	    1.100	    1.100	  0.009%	  0.834%	   200.704	        0	mixed3b_pool_reduce_pre_relu/conv
-2018-09-10 13:58:23.183295: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   89.657	    0.211	    0.211	  0.002%	  0.835%	     0.000	        0	mixed3b_pool_reduce_pre_relu
-2018-09-10 13:58:23.183311: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   89.874	    0.051	    0.051	  0.000%	  0.836%	     0.000	        0	mixed3b_pool_reduce
-2018-09-10 13:58:23.183323: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   89.643	    1.742	    1.742	  0.014%	  0.850%	   100.352	        0	mixed3b_5x5_bottleneck_pre_relu/conv
-2018-09-10 13:58:23.183339: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   89.218	    2.148	    2.148	  0.018%	  0.868%	   401.408	        0	mixed3b_3x3_bottleneck_pre_relu/conv
-2018-09-10 13:58:23.183351: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   91.390	    0.067	    0.067	  0.001%	  0.868%	     0.000	        0	mixed3b_5x5_bottleneck_pre_relu
-2018-09-10 13:58:23.183366: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   91.463	    0.029	    0.029	  0.000%	  0.869%	     0.000	        0	mixed3b_5x5_bottleneck
-2018-09-10 13:58:23.183378: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   91.420	    1.047	    1.047	  0.009%	  0.877%	     0.000	        0	mixed3b_3x3_bottleneck_pre_relu
-2018-09-10 13:58:23.183393: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   92.474	    0.977	    0.977	  0.008%	  0.885%	     0.000	        0	mixed3b_3x3_bottleneck
-2018-09-10 13:58:23.183405: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   86.883	   16.883	   16.883	  0.139%	  1.024%	   401.408	        0	mixed3b_1x1_pre_relu/conv
-2018-09-10 13:58:23.183420: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  103.811	    0.338	    0.338	  0.003%	  1.027%	     0.000	        0	mixed3b_1x1_pre_relu
-2018-09-10 13:58:23.183433: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  104.155	    0.117	    0.117	  0.001%	  1.028%	     0.000	        0	mixed3b_1x1
-2018-09-10 13:58:23.192703: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   91.495	   13.281	   13.281	  0.109%	  1.137%	   301.056	        0	mixed3b_5x5_pre_relu/conv
-2018-09-10 13:58:23.192805: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  104.812	    0.191	    0.191	  0.002%	  1.139%	     0.000	        0	mixed3b_5x5_pre_relu
-2018-09-10 13:58:23.192826: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  105.007	    0.073	    0.073	  0.001%	  1.140%	     0.000	        0	mixed3b_5x5
-2018-09-10 13:58:23.192846: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   93.456	   13.332	   13.332	  0.110%	  1.249%	   602.112	        0	mixed3b_3x3_pre_relu/conv
-2018-09-10 13:58:23.192867: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  106.815	    0.531	    0.531	  0.004%	  1.254%	     0.000	        0	mixed3b_3x3_pre_relu
-2018-09-10 13:58:23.192887: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  107.351	    0.163	    0.163	  0.001%	  1.255%	     0.000	        0	mixed3b_3x3
-2018-09-10 13:58:23.192907: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	  107.518	    0.246	    0.246	  0.002%	  1.257%	  1505.280	        0	mixed3b
-2018-09-10 13:58:23.192927: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	  107.775	    0.856	    0.856	  0.007%	  1.264%	   376.320	        0	maxpool4
-2018-09-10 13:58:23.192948: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	  112.280	    0.771	    0.771	  0.006%	  1.270%	   376.320	        0	mixed4a_pool
-2018-09-10 13:58:23.192968: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	  113.066	    1.028	    1.028	  0.008%	  1.279%	    50.176	        0	mixed4a_pool_reduce_pre_relu/conv
-2018-09-10 13:58:23.192988: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  114.101	    0.049	    0.049	  0.000%	  1.279%	     0.000	        0	mixed4a_pool_reduce_pre_relu
-2018-09-10 13:58:23.193009: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  114.156	    0.021	    0.021	  0.000%	  1.279%	     0.000	        0	mixed4a_pool_reduce
-2018-09-10 13:58:23.193028: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	  114.183	    0.649	    0.649	  0.005%	  1.285%	    12.544	        0	mixed4a_5x5_bottleneck_pre_relu/conv
-2018-09-10 13:58:23.193048: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  114.837	    0.016	    0.016	  0.000%	  1.285%	     0.000	        0	mixed4a_5x5_bottleneck_pre_relu
-2018-09-10 13:58:23.193068: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  114.856	    0.009	    0.009	  0.000%	  1.285%	     0.000	        0	mixed4a_5x5_bottleneck
-2018-09-10 13:58:23.193087: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	  113.874	    2.021	    2.021	  0.017%	  1.302%	    75.264	        0	mixed4a_3x3_bottleneck_pre_relu/conv
-2018-09-10 13:58:23.193107: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  115.915	    0.060	    0.060	  0.000%	  1.302%	     0.000	        0	mixed4a_3x3_bottleneck_pre_relu
-2018-09-10 13:58:23.193127: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  115.980	    0.066	    0.066	  0.001%	  1.303%	     0.000	        0	mixed4a_3x3_bottleneck
-2018-09-10 13:58:23.193147: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	  114.870	    2.234	    2.234	  0.018%	  1.321%	    37.632	        0	mixed4a_5x5_pre_relu/conv
-2018-09-10 13:58:23.193168: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  117.113	    0.031	    0.031	  0.000%	  1.321%	     0.000	        0	mixed4a_5x5_pre_relu
-2018-09-10 13:58:23.193188: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  117.148	    0.018	    0.018	  0.000%	  1.322%	     0.000	        0	mixed4a_5x5
-2018-09-10 13:58:23.193207: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	  113.680	    4.673	    4.673	  0.038%	  1.360%	   150.528	        0	mixed4a_1x1_pre_relu/conv
-2018-09-10 13:58:23.193227: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  118.387	    0.096	    0.096	  0.001%	  1.361%	     0.000	        0	mixed4a_1x1_pre_relu
-2018-09-10 13:58:23.202816: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  118.487	    0.040	    0.040	  0.000%	  1.361%	     0.000	        0	mixed4a_1x1
-2018-09-10 13:58:23.202860: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	  116.050	    2.612	    2.612	  0.022%	  1.383%	   159.936	        0	mixed4a_3x3_pre_relu/conv
-2018-09-10 13:58:23.202880: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  118.672	    0.098	    0.098	  0.001%	  1.383%	     0.000	        0	mixed4a_3x3_pre_relu
-2018-09-10 13:58:23.202899: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  118.774	    0.041	    0.041	  0.000%	  1.384%	     0.000	        0	mixed4a_3x3
-2018-09-10 13:58:23.202918: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	  118.820	   20.041	   20.041	  0.165%	  1.549%	   398.272	        0	mixed4a
-2018-09-10 13:58:23.202937: I tensorflow/core/util/stat_summarizer.cc:85] 	                 AvgPool	  138.925	    0.265	    0.265	  0.002%	  1.551%	    32.512	        0	head0_pool
-2018-09-10 13:58:23.202955: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	  139.195	    0.237	    0.237	  0.002%	  1.553%	     8.192	        0	head0_bottleneck_pre_relu/conv
-2018-09-10 13:58:23.202974: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  139.437	    0.024	    0.024	  0.000%	  1.553%	     0.000	        0	head0_bottleneck_pre_relu
-2018-09-10 13:58:23.202993: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  139.468	    0.011	    0.011	  0.000%	  1.553%	     0.000	        0	head0_bottleneck
-2018-09-10 13:58:23.203012: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Reshape	  139.483	    0.014	    0.014	  0.000%	  1.553%	     0.000	        0	head0_bottleneck/reshape
-2018-09-10 13:58:23.203031: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	  139.501	    1.206	    1.206	  0.010%	  1.563%	     4.096	        0	nn0_pre_relu/matmul
-2018-09-10 13:58:23.203050: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  140.734	    0.032	    0.032	  0.000%	  1.564%	     0.000	        0	nn0_pre_relu
-2018-09-10 13:58:23.203069: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	  140.770	    0.011	    0.011	  0.000%	  1.564%	     0.000	        0	nn0
-2018-09-10 13:58:23.203088: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	  140.785	    0.689	    0.689	  0.006%	  1.569%	     4.032	        0	softmax0_pre_activation/matmul
-2018-09-10 13:58:23.203107: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	  141.484	    0.014	    0.014	  0.000%	  1.569%	     0.000	        0	softmax0_pre_activation
-2018-09-10 13:58:23.203126: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Softmax	  141.502	    0.040	    0.040	  0.000%	  1.570%	     0.000	        0	softmax0
-2018-09-10 13:58:23.203144: I tensorflow/core/util/stat_summarizer.cc:85] 	                Identity	  141.545	    0.008	    0.008	  0.000%	  1.570%	     0.000	        0	output
-2018-09-10 13:58:23.203163: I tensorflow/core/util/stat_summarizer.cc:85] 	                 _Retval	  141.556	    0.015	    0.015	  0.000%	  1.570%	     0.000	        0	_retval_output_0_0
-2018-09-10 13:58:23.203181: I tensorflow/core/util/stat_summarizer.cc:85] 
-2018-09-10 13:58:23.203195: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Top by Computation Time ==============================
-2018-09-10 13:58:23.203210: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
-2018-09-10 13:58:23.222534: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   61.929	   24.205	   24.205	  0.199%	  0.199%	   401.408	        0	mixed3a_3x3_pre_relu/conv
-2018-09-10 13:58:23.222648: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	  118.820	   20.041	   20.041	  0.165%	  0.364%	   398.272	        0	mixed4a
-2018-09-10 13:58:23.222672: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   86.883	   16.883	   16.883	  0.139%	  0.503%	   401.408	        0	mixed3b_1x1_pre_relu/conv
-2018-09-10 13:58:23.222692: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	   41.029	   15.876	   15.876	  0.131%	  0.634%	  2408.448	        0	localresponsenorm1
-2018-09-10 13:58:23.222716: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.552	   14.106	   14.106	  0.116%	  0.750%	  3211.264	        0	conv2d0_pre_relu/conv
-2018-09-10 13:58:23.222735: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   25.040	   13.580	   13.580	  0.112%	  0.862%	  2408.448	        0	conv2d2_pre_relu/conv
-2018-09-10 13:58:23.222758: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   93.456	   13.332	   13.332	  0.110%	  0.972%	   602.112	        0	mixed3b_3x3_pre_relu/conv
-2018-09-10 13:58:23.222782: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   91.495	   13.281	   13.281	  0.109%	  1.081%	   301.056	        0	mixed3b_5x5_pre_relu/conv
-2018-09-10 13:58:23.222801: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   60.250	    8.268	    8.268	  0.068%	  1.149%	   100.352	        0	mixed3a_pool_reduce_pre_relu/conv
-2018-09-10 13:58:23.222820: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	  113.680	    4.673	    4.673	  0.038%	  1.188%	   150.528	        0	mixed4a_1x1_pre_relu/conv
-2018-09-10 13:58:23.222843: I tensorflow/core/util/stat_summarizer.cc:85] 
-2018-09-10 13:58:23.222857: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Top by Memory Use ==============================
-2018-09-10 13:58:23.222876: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
-2018-09-10 13:58:23.222895: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.552	   14.106	   14.106	  0.116%	  0.116%	  3211.264	        0	conv2d0_pre_relu/conv
-2018-09-10 13:58:23.222919: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	   41.029	   15.876	   15.876	  0.131%	  0.247%	  2408.448	        0	localresponsenorm1
-2018-09-10 13:58:23.222938: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   25.040	   13.580	   13.580	  0.112%	  0.359%	  2408.448	        0	conv2d2_pre_relu/conv
-2018-09-10 13:58:23.222961: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	  107.518	    0.246	    0.246	  0.002%	  0.361%	  1505.280	        0	mixed3b
-2018-09-10 13:58:23.222985: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   86.885	    1.651	    1.651	  0.014%	  0.374%	   802.816	        0	mixed3b_pool
-2018-09-10 13:58:23.223004: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   86.557	    0.271	    0.271	  0.002%	  0.377%	   802.816	        0	mixed3a
-2018-09-10 13:58:23.223027: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	   21.280	    2.148	    2.148	  0.018%	  0.394%	   802.816	        0	localresponsenorm0
-2018-09-10 13:58:23.223047: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   19.010	    2.236	    2.236	  0.018%	  0.413%	   802.816	        0	maxpool0
-2018-09-10 13:58:23.223070: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   23.441	    1.133	    1.133	  0.009%	  0.422%	   802.816	        0	conv2d1_pre_relu/conv
-2018-09-10 13:58:23.223094: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   58.655	    1.585	    1.585	  0.013%	  0.435%	   602.112	        0	mixed3a_pool
-2018-09-10 13:58:23.223113: I tensorflow/core/util/stat_summarizer.cc:85] 
-2018-09-10 13:58:23.223127: I tensorflow/core/util/stat_summarizer.cc:85] Number of nodes executed: 139
-2018-09-10 13:58:23.223145: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Summary by node type ==============================
-2018-09-10 13:58:23.223160: I tensorflow/core/util/stat_summarizer.cc:85] 	             [Node type]	  [count]	  [avg ms]	    [avg %]	    [cdf %]	  [mem KB]	[times called]
-2018-09-10 13:58:23.223182: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	       22	     1.746	    68.097%	    68.097%	 10077.888	        0
-2018-09-10 13:58:23.223201: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	        3	     0.280	    10.920%	    79.017%	  2706.368	        0
-2018-09-10 13:58:23.223224: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	        2	     0.246	     9.594%	    88.612%	  3211.264	        0
-2018-09-10 13:58:23.223246: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	       24	     0.120	     4.680%	    93.292%	     0.000	        0
-2018-09-10 13:58:23.223264: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	        6	     0.115	     4.485%	    97.777%	  3562.496	        0
-2018-09-10 13:58:23.223291: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	       23	     0.029	     1.131%	    98.908%	     0.000	        0
-2018-09-10 13:58:23.223309: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	        2	     0.025	     0.975%	    99.883%	     8.128	        0
-2018-09-10 13:58:23.223331: I tensorflow/core/util/stat_summarizer.cc:85] 	                 AvgPool	        1	     0.003	     0.117%	   100.000%	    32.512	        0
-2018-09-10 13:58:23.223353: I tensorflow/core/util/stat_summarizer.cc:85] 	                 _Retval	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 13:58:23.223376: I tensorflow/core/util/stat_summarizer.cc:85] 	                    _Arg	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 13:58:23.223394: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Softmax	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 13:58:23.223418: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Reshape	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 13:58:23.223439: I tensorflow/core/util/stat_summarizer.cc:85] 	                    NoOp	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 13:58:23.223462: I tensorflow/core/util/stat_summarizer.cc:85] 	                Identity	        1	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 13:58:23.223484: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	       50	     0.000	     0.000%	   100.000%	     0.000	        0
-2018-09-10 13:58:23.223501: I tensorflow/core/util/stat_summarizer.cc:85] 
-2018-09-10 13:58:23.223517: I tensorflow/core/util/stat_summarizer.cc:85] Timings (microseconds): count=73 first=190643 curr=169194 min=100704 max=288910 avg=166348 std=43610
-2018-09-10 13:58:23.223536: I tensorflow/core/util/stat_summarizer.cc:85] Memory (bytes): count=73 curr=19598656(all same)
-2018-09-10 13:58:23.223551: I tensorflow/core/util/stat_summarizer.cc:85] 139 nodes observed
-2018-09-10 13:58:23.223568: I tensorflow/core/util/stat_summarizer.cc:85] 
-```
+I5-7440HQ: -march=native, ~10x performance boost
 
 # [amd64/CPU] generic code / native code, benchmarking with inceptionv5
 
 Source
-> Same as above
+> https://salsa.debian.org/science-team/tensorflow
+> b7252d13d59ebecae7928daa25af3a5ab1289bae
 
 Machine
 > Architecture:        x86_64
@@ -527,10 +43,6 @@ Machine
 > NUMA node0 CPU(s):   0-3
 > Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb invpcid_single pti ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp flush_l1d
 > 
-
-Source changes
-```
-```
 
 Generic result
 ```
@@ -755,4 +267,228 @@ Generic result
 2018-09-10 13:35:21.431840: I tensorflow/core/util/stat_summarizer.cc:85] Memory (bytes): count=221 curr=19598656(all same)
 2018-09-10 13:35:21.431844: I tensorflow/core/util/stat_summarizer.cc:85] 139 nodes observed
 2018-09-10 13:35:21.431848: I tensorflow/core/util/stat_summarizer.cc:85] 
+```
+
+march=native
+```
+~/p/t/tensorflow ❯❯❯ ./tf_benchmark_model --graph=../tensorflow_inception_graph.pb
+2018-09-10 16:03:10.709451: I tensorflow/tools/benchmark/benchmark_model.cc:469] Graph: [../tensorflow_inception_graph.pb]
+2018-09-10 16:03:10.709490: I tensorflow/tools/benchmark/benchmark_model.cc:470] Init ops:
+2018-09-10 16:03:10.709495: I tensorflow/tools/benchmark/benchmark_model.cc:471] Input layers: [input:0]
+2018-09-10 16:03:10.709499: I tensorflow/tools/benchmark/benchmark_model.cc:472] Input shapes: [1,224,224,3]
+2018-09-10 16:03:10.709502: I tensorflow/tools/benchmark/benchmark_model.cc:473] Input types: [float]
+2018-09-10 16:03:10.709505: I tensorflow/tools/benchmark/benchmark_model.cc:474] Output layers: [output:0]
+2018-09-10 16:03:10.709508: I tensorflow/tools/benchmark/benchmark_model.cc:475] Target layers: []
+2018-09-10 16:03:10.709515: I tensorflow/tools/benchmark/benchmark_model.cc:476] Num runs: [1000]
+2018-09-10 16:03:10.709518: I tensorflow/tools/benchmark/benchmark_model.cc:477] Inter-inference delay (seconds): [-1.0]
+2018-09-10 16:03:10.709522: I tensorflow/tools/benchmark/benchmark_model.cc:478] Inter-benchmark delay (seconds): [-1.0]
+2018-09-10 16:03:10.709525: I tensorflow/tools/benchmark/benchmark_model.cc:480] Num threads: [-1]
+2018-09-10 16:03:10.709528: I tensorflow/tools/benchmark/benchmark_model.cc:481] Benchmark name: []
+2018-09-10 16:03:10.709531: I tensorflow/tools/benchmark/benchmark_model.cc:482] Output prefix: []
+2018-09-10 16:03:10.709535: I tensorflow/tools/benchmark/benchmark_model.cc:483] Show sizes: [0]
+2018-09-10 16:03:10.709538: I tensorflow/tools/benchmark/benchmark_model.cc:484] Warmup runs: [1]
+2018-09-10 16:03:10.709560: I tensorflow/tools/benchmark/benchmark_model.cc:251] Loading TensorFlow.
+2018-09-10 16:03:10.709566: I tensorflow/tools/benchmark/benchmark_model.cc:258] Got config, 0 devices
+2018-09-10 16:03:10.773621: I tensorflow/tools/benchmark/benchmark_model.cc:496] Initialized session in 0.064025s
+2018-09-10 16:03:10.773726: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1 iterations, max -1 seconds without detailed stat logging, with -1s sleep between inferences
+2018-09-10 16:03:10.999520: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=1 curr=225469
+
+2018-09-10 16:03:10.999572: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1000 iterations, max 10 seconds without detailed stat logging, with -1s sleep between inferences
+2018-09-10 16:03:21.028048: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=618 first=19309 curr=16199 min=13342 max=20241 avg=16181.9 std=919
+
+2018-09-10 16:03:21.028082: I tensorflow/tools/benchmark/benchmark_model.cc:327] Running benchmark for max 1000 iterations, max 10 seconds with detailed stat logging, with -1s sleep between inferences
+2018-09-10 16:03:31.681492: I tensorflow/tools/benchmark/benchmark_model.cc:361] count=573 first=19017 curr=17118 min=15818 max=23959 avg=17474 std=991
+
+2018-09-10 16:03:31.681528: I tensorflow/tools/benchmark/benchmark_model.cc:600] Average inference timings in us: Warmup: 225469, no stats: 16181, with stats: 17474
+2018-09-10 16:03:31.682683: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Run Order ==============================
+2018-09-10 16:03:31.682695: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
+2018-09-10 16:03:31.682702: I tensorflow/core/util/stat_summarizer.cc:85] 	                    NoOp	    0.000	    0.007	    0.007	  0.000%	  0.000%	     0.000	        0	_SOURCE
+2018-09-10 16:03:31.682708: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.015	    0.011	    0.011	  0.000%	  0.000%	     0.000	        0	mixed4a_1x1_w
+2018-09-10 16:03:31.682714: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.028	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a_1x1_b
+2018-09-10 16:03:31.682721: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.031	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a_3x3_bottleneck_w
+2018-09-10 16:03:31.682731: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.034	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a_3x3_bottleneck_b
+2018-09-10 16:03:31.682741: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.037	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a_3x3_w
+2018-09-10 16:03:31.682748: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.039	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a_3x3_b
+2018-09-10 16:03:31.682756: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.042	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a_5x5_bottleneck_w
+2018-09-10 16:03:31.682763: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.045	    0.001	    0.001	  0.000%	  0.000%	     0.000	        0	mixed4a_5x5_bottleneck_b
+2018-09-10 16:03:31.682771: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.047	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a_5x5_w
+2018-09-10 16:03:31.682778: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.049	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a_5x5_b
+2018-09-10 16:03:31.682787: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.052	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_1x1_w
+2018-09-10 16:03:31.682794: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.055	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_1x1_b
+2018-09-10 16:03:31.682803: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.058	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_3x3_bottleneck_w
+2018-09-10 16:03:31.682811: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.060	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_3x3_bottleneck_b
+2018-09-10 16:03:31.682821: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.063	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_3x3_w
+2018-09-10 16:03:31.682829: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.065	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_3x3_b
+2018-09-10 16:03:31.682837: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.068	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_5x5_bottleneck_w
+2018-09-10 16:03:31.682847: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.070	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_5x5_bottleneck_b
+2018-09-10 16:03:31.682855: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.073	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_5x5_w
+2018-09-10 16:03:31.682864: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.075	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3b_5x5_b
+2018-09-10 16:03:31.682871: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.077	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed4a/concat_dim
+2018-09-10 16:03:31.682883: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.080	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3a_1x1_w
+2018-09-10 16:03:31.682891: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.082	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3a_1x1_b
+2018-09-10 16:03:31.682900: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.085	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3a_3x3_bottleneck_w
+2018-09-10 16:03:31.682909: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.088	    0.001	    0.001	  0.000%	  0.000%	     0.000	        0	mixed3a_3x3_bottleneck_b
+2018-09-10 16:03:31.682917: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.090	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3a_3x3_w
+2018-09-10 16:03:31.682926: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.092	    0.002	    0.002	  0.000%	  0.000%	     0.000	        0	mixed3a_3x3_b
+2018-09-10 16:03:31.682935: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.095	    0.001	    0.001	  0.000%	  0.000%	     0.000	        0	mixed3a_5x5_bottleneck_w
+2018-09-10 16:03:31.682943: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.097	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	mixed3a_5x5_bottleneck_b
+2018-09-10 16:03:31.682953: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.099	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	mixed3a_5x5_w
+2018-09-10 16:03:31.682961: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.102	    0.001	    0.001	  0.000%	  0.001%	     0.000	        0	mixed3a_5x5_b
+2018-09-10 16:03:31.682972: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.104	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	conv2d0_w
+2018-09-10 16:03:31.682980: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.107	    0.001	    0.001	  0.000%	  0.001%	     0.000	        0	conv2d0_b
+2018-09-10 16:03:31.682989: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.109	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	conv2d1_w
+2018-09-10 16:03:31.683001: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.111	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	conv2d1_b
+2018-09-10 16:03:31.683012: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.114	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	conv2d2_w
+2018-09-10 16:03:31.683021: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.116	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	conv2d2_b
+2018-09-10 16:03:31.683030: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.119	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	mixed3a_pool_reduce_w
+2018-09-10 16:03:31.683041: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.121	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	mixed3a_pool_reduce_b
+2018-09-10 16:03:31.683050: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.124	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	mixed3b_pool_reduce_w
+2018-09-10 16:03:31.683060: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.126	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	mixed3b_pool_reduce_b
+2018-09-10 16:03:31.683070: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.129	    0.001	    0.001	  0.000%	  0.001%	     0.000	        0	mixed4a_pool_reduce_w
+2018-09-10 16:03:31.683081: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.131	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	mixed4a_pool_reduce_b
+2018-09-10 16:03:31.683089: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.133	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	head0_bottleneck_w
+2018-09-10 16:03:31.683099: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.136	    0.001	    0.001	  0.000%	  0.001%	     0.000	        0	head0_bottleneck_b
+2018-09-10 16:03:31.683108: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.138	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	head0_bottleneck/reshape/shape
+2018-09-10 16:03:31.683121: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.141	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	nn0_w
+2018-09-10 16:03:31.683132: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.143	    0.002	    0.002	  0.000%	  0.001%	     0.000	        0	nn0_b
+2018-09-10 16:03:31.683142: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.146	    0.001	    0.001	  0.000%	  0.001%	     0.000	        0	softmax0_w
+2018-09-10 16:03:31.683150: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	    0.148	    0.001	    0.001	  0.000%	  0.001%	     0.000	        0	softmax0_b
+2018-09-10 16:03:31.683161: I tensorflow/core/util/stat_summarizer.cc:85] 	                    _Arg	    0.150	    0.003	    0.003	  0.000%	  0.001%	     0.000	        0	_arg_input_0_0
+2018-09-10 16:03:31.683173: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.154	    3.185	    3.185	  0.023%	  0.023%	  3211.264	        0	conv2d0_pre_relu/conv
+2018-09-10 16:03:31.683184: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	    3.354	    0.185	    0.185	  0.001%	  0.025%	     0.000	        0	conv2d0_pre_relu
+2018-09-10 16:03:31.683194: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	    3.541	    0.115	    0.115	  0.001%	  0.025%	     0.000	        0	conv2d0
+2018-09-10 16:03:31.683202: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	    3.661	    0.581	    0.581	  0.004%	  0.030%	   802.816	        0	maxpool0
+2018-09-10 16:03:31.683213: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	    4.249	    0.256	    0.256	  0.002%	  0.031%	   802.816	        0	localresponsenorm0
+2018-09-10 16:03:31.683222: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    4.514	    0.180	    0.180	  0.001%	  0.033%	   802.816	        0	conv2d1_pre_relu/conv
+2018-09-10 16:03:31.683231: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	    4.699	    0.061	    0.061	  0.000%	  0.033%	     0.000	        0	conv2d1_pre_relu
+2018-09-10 16:03:31.683241: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	    4.762	    0.026	    0.026	  0.000%	  0.033%	     0.000	        0	conv2d1
+2018-09-10 16:03:31.683250: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    4.790	    2.886	    2.886	  0.020%	  0.054%	  2408.448	        0	conv2d2_pre_relu/conv
+2018-09-10 16:03:31.683258: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	    7.693	    0.140	    0.140	  0.001%	  0.055%	     0.000	        0	conv2d2_pre_relu
+2018-09-10 16:03:31.683267: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	    7.837	    0.064	    0.064	  0.000%	  0.055%	     0.000	        0	conv2d2
+2018-09-10 16:03:31.683275: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	    7.903	    1.459	    1.459	  0.010%	  0.065%	  2408.448	        0	localresponsenorm1
+2018-09-10 16:03:31.683284: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	    9.374	    0.324	    0.324	  0.002%	  0.068%	   602.112	        0	maxpool1
+2018-09-10 16:03:31.683294: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    9.781	    0.202	    0.202	  0.001%	  0.069%	    50.176	        0	mixed3a_5x5_bottleneck_pre_relu/conv
+2018-09-10 16:03:31.683304: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	    9.990	    0.014	    0.014	  0.000%	  0.069%	     0.000	        0	mixed3a_5x5_bottleneck_pre_relu
+2018-09-10 16:03:31.683313: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   10.006	    0.005	    0.005	  0.000%	  0.069%	     0.000	        0	mixed3a_5x5_bottleneck
+2018-09-10 16:03:31.683325: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	    9.718	    0.304	    0.304	  0.002%	  0.071%	   602.112	        0	mixed3a_pool
+2018-09-10 16:03:31.683334: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    9.720	    0.467	    0.467	  0.003%	  0.075%	   200.704	        0	mixed3a_1x1_pre_relu/conv
+2018-09-10 16:03:31.683344: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    9.724	    0.471	    0.471	  0.003%	  0.078%	   301.056	        0	mixed3a_3x3_bottleneck_pre_relu/conv
+2018-09-10 16:03:31.683354: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   10.196	    0.031	    0.031	  0.000%	  0.078%	     0.000	        0	mixed3a_1x1_pre_relu
+2018-09-10 16:03:31.683368: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   10.229	    0.009	    0.009	  0.000%	  0.078%	     0.000	        0	mixed3a_1x1
+2018-09-10 16:03:31.683376: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   10.201	    0.042	    0.042	  0.000%	  0.079%	     0.000	        0	mixed3a_3x3_bottleneck_pre_relu
+2018-09-10 16:03:31.683387: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   10.245	    0.012	    0.012	  0.000%	  0.079%	     0.000	        0	mixed3a_3x3_bottleneck
+2018-09-10 16:03:31.683396: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   10.025	    0.497	    0.497	  0.004%	  0.082%	   100.352	        0	mixed3a_pool_reduce_pre_relu/conv
+2018-09-10 16:03:31.683405: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   10.524	    0.016	    0.016	  0.000%	  0.082%	     0.000	        0	mixed3a_pool_reduce_pre_relu
+2018-09-10 16:03:31.683413: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   10.542	    0.005	    0.005	  0.000%	  0.082%	     0.000	        0	mixed3a_pool_reduce
+2018-09-10 16:03:31.683423: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   10.013	    1.208	    1.208	  0.009%	  0.091%	   100.352	        0	mixed3a_5x5_pre_relu/conv
+2018-09-10 16:03:31.683432: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   11.224	    0.016	    0.016	  0.000%	  0.091%	     0.000	        0	mixed3a_5x5_pre_relu
+2018-09-10 16:03:31.683441: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   11.241	    0.006	    0.006	  0.000%	  0.091%	     0.000	        0	mixed3a_5x5
+2018-09-10 16:03:31.683451: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   10.259	    1.601	    1.601	  0.011%	  0.102%	   401.408	        0	mixed3a_3x3_pre_relu/conv
+2018-09-10 16:03:31.683461: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   11.875	    0.052	    0.052	  0.000%	  0.103%	     0.000	        0	mixed3a_3x3_pre_relu
+2018-09-10 16:03:31.683470: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   11.930	    0.026	    0.026	  0.000%	  0.103%	     0.000	        0	mixed3a_3x3
+2018-09-10 16:03:31.683479: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   11.957	    0.103	    0.103	  0.001%	  0.104%	   802.816	        0	mixed3a
+2018-09-10 16:03:31.683489: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   12.072	    0.478	    0.478	  0.003%	  0.107%	   802.816	        0	mixed3b_pool
+2018-09-10 16:03:31.683499: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   12.080	    0.680	    0.680	  0.005%	  0.112%	   401.408	        0	mixed3b_3x3_bottleneck_pre_relu/conv
+2018-09-10 16:03:31.683510: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   12.772	    0.103	    0.103	  0.001%	  0.113%	     0.000	        0	mixed3b_3x3_bottleneck_pre_relu
+2018-09-10 16:03:31.683518: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   12.577	    0.481	    0.481	  0.003%	  0.116%	   100.352	        0	mixed3b_5x5_bottleneck_pre_relu/conv
+2018-09-10 16:03:31.683528: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   13.063	    0.027	    0.027	  0.000%	  0.116%	     0.000	        0	mixed3b_5x5_bottleneck_pre_relu
+2018-09-10 16:03:31.683538: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   13.092	    0.007	    0.007	  0.000%	  0.116%	     0.000	        0	mixed3b_5x5_bottleneck
+2018-09-10 16:03:31.683548: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   12.880	    0.271	    0.271	  0.002%	  0.118%	     0.000	        0	mixed3b_3x3_bottleneck
+2018-09-10 16:03:31.683557: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   12.557	    0.766	    0.766	  0.005%	  0.124%	   200.704	        0	mixed3b_pool_reduce_pre_relu/conv
+2018-09-10 16:03:31.683568: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   13.335	    0.034	    0.034	  0.000%	  0.124%	     0.000	        0	mixed3b_pool_reduce_pre_relu
+2018-09-10 16:03:31.683577: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   13.371	    0.010	    0.010	  0.000%	  0.124%	     0.000	        0	mixed3b_pool_reduce
+2018-09-10 16:03:31.683588: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   12.075	    1.576	    1.576	  0.011%	  0.135%	   401.408	        0	mixed3b_1x1_pre_relu/conv
+2018-09-10 16:03:31.683597: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   13.662	    0.696	    0.696	  0.005%	  0.140%	     0.000	        0	mixed3b_1x1_pre_relu
+2018-09-10 16:03:31.683609: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   14.377	    0.361	    0.361	  0.003%	  0.143%	     0.000	        0	mixed3b_1x1
+2018-09-10 16:03:31.683617: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   13.101	    2.512	    2.512	  0.018%	  0.160%	   301.056	        0	mixed3b_5x5_pre_relu/conv
+2018-09-10 16:03:31.683627: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   15.640	    0.075	    0.075	  0.001%	  0.161%	     0.000	        0	mixed3b_5x5_pre_relu
+2018-09-10 16:03:31.683637: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   15.718	    0.022	    0.022	  0.000%	  0.161%	     0.000	        0	mixed3b_5x5
+2018-09-10 16:03:31.683646: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   13.153	    3.454	    3.454	  0.024%	  0.185%	   602.112	        0	mixed3b_3x3_pre_relu/conv
+2018-09-10 16:03:31.683656: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   16.616	    0.046	    0.046	  0.000%	  0.186%	     0.000	        0	mixed3b_3x3_pre_relu
+2018-09-10 16:03:31.683666: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   16.665	    0.028	    0.028	  0.000%	  0.186%	     0.000	        0	mixed3b_3x3
+2018-09-10 16:03:31.683675: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   16.695	    0.105	    0.105	  0.001%	  0.187%	  1505.280	        0	mixed3b
+2018-09-10 16:03:31.683688: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   16.808	    0.171	    0.171	  0.001%	  0.188%	   376.320	        0	maxpool4
+2018-09-10 16:03:31.683697: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   16.991	    0.118	    0.118	  0.001%	  0.189%	   376.320	        0	mixed4a_pool
+2018-09-10 16:03:31.683710: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   16.997	    0.114	    0.114	  0.001%	  0.190%	    12.544	        0	mixed4a_5x5_bottleneck_pre_relu/conv
+2018-09-10 16:03:31.683720: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   17.115	    0.006	    0.006	  0.000%	  0.190%	     0.000	        0	mixed4a_5x5_bottleneck_pre_relu
+2018-09-10 16:03:31.683730: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   17.122	    0.003	    0.003	  0.000%	  0.190%	     0.000	        0	mixed4a_5x5_bottleneck
+2018-09-10 16:03:31.683739: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.127	    0.191	    0.191	  0.001%	  0.191%	    37.632	        0	mixed4a_5x5_pre_relu/conv
+2018-09-10 16:03:31.683749: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   17.321	    0.009	    0.009	  0.000%	  0.191%	     0.000	        0	mixed4a_5x5_pre_relu
+2018-09-10 16:03:31.683759: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   17.331	    0.003	    0.003	  0.000%	  0.191%	     0.000	        0	mixed4a_5x5
+2018-09-10 16:03:31.683769: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.112	    0.227	    0.227	  0.002%	  0.193%	    50.176	        0	mixed4a_pool_reduce_pre_relu/conv
+2018-09-10 16:03:31.683779: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   17.341	    0.011	    0.011	  0.000%	  0.193%	     0.000	        0	mixed4a_pool_reduce_pre_relu
+2018-09-10 16:03:31.683789: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   17.354	    0.004	    0.004	  0.000%	  0.193%	     0.000	        0	mixed4a_pool_reduce
+2018-09-10 16:03:31.683797: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   16.994	    0.396	    0.396	  0.003%	  0.196%	    75.264	        0	mixed4a_3x3_bottleneck_pre_relu/conv
+2018-09-10 16:03:31.683806: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   17.393	    0.014	    0.014	  0.000%	  0.196%	     0.000	        0	mixed4a_3x3_bottleneck_pre_relu
+2018-09-10 16:03:31.683816: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   17.408	    0.005	    0.005	  0.000%	  0.196%	     0.000	        0	mixed4a_3x3_bottleneck
+2018-09-10 16:03:31.683826: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   16.991	    0.498	    0.498	  0.004%	  0.199%	   150.528	        0	mixed4a_1x1_pre_relu/conv
+2018-09-10 16:03:31.683837: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   17.493	    0.023	    0.023	  0.000%	  0.199%	     0.000	        0	mixed4a_1x1_pre_relu
+2018-09-10 16:03:31.683846: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   17.518	    0.006	    0.006	  0.000%	  0.199%	     0.000	        0	mixed4a_1x1
+2018-09-10 16:03:31.683855: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   17.414	    0.459	    0.459	  0.003%	  0.203%	   159.936	        0	mixed4a_3x3_pre_relu/conv
+2018-09-10 16:03:31.683864: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   17.881	    0.030	    0.030	  0.000%	  0.203%	     0.000	        0	mixed4a_3x3_pre_relu
+2018-09-10 16:03:31.683873: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   17.912	    0.008	    0.008	  0.000%	  0.203%	     0.000	        0	mixed4a_3x3
+2018-09-10 16:03:31.683884: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   17.922	    0.048	    0.048	  0.000%	  0.203%	   398.272	        0	mixed4a
+2018-09-10 16:03:31.683894: I tensorflow/core/util/stat_summarizer.cc:85] 	                 AvgPool	   17.975	    0.058	    0.058	  0.000%	  0.204%	    32.512	        0	head0_pool
+2018-09-10 16:03:31.683904: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   18.035	    0.064	    0.064	  0.000%	  0.204%	     8.192	        0	head0_bottleneck_pre_relu/conv
+2018-09-10 16:03:31.683914: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   18.101	    0.004	    0.004	  0.000%	  0.204%	     0.000	        0	head0_bottleneck_pre_relu
+2018-09-10 16:03:31.683924: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   18.107	    0.003	    0.003	  0.000%	  0.204%	     0.000	        0	head0_bottleneck
+2018-09-10 16:03:31.683933: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Reshape	   18.111	    0.003	    0.003	  0.000%	  0.204%	     0.000	        0	head0_bottleneck/reshape
+2018-09-10 16:03:31.683943: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	   18.115	    0.464	    0.464	  0.003%	  0.208%	     4.096	        0	nn0_pre_relu/matmul
+2018-09-10 16:03:31.683953: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   18.581	    0.003	    0.003	  0.000%	  0.208%	     0.000	        0	nn0_pre_relu
+2018-09-10 16:03:31.683961: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	   18.585	    0.002	    0.002	  0.000%	  0.208%	     0.000	        0	nn0
+2018-09-10 16:03:31.683972: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	   18.589	    0.228	    0.228	  0.002%	  0.209%	     4.032	        0	softmax0_pre_activation/matmul
+2018-09-10 16:03:31.683981: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   18.819	    0.003	    0.003	  0.000%	  0.209%	     0.000	        0	softmax0_pre_activation
+2018-09-10 16:03:31.683993: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Softmax	   18.823	    0.027	    0.027	  0.000%	  0.209%	     0.000	        0	softmax0
+2018-09-10 16:03:31.684002: I tensorflow/core/util/stat_summarizer.cc:85] 	                Identity	   18.851	    0.001	    0.001	  0.000%	  0.209%	     0.000	        0	output
+2018-09-10 16:03:31.684012: I tensorflow/core/util/stat_summarizer.cc:85] 	                 _Retval	   18.853	    0.005	    0.005	  0.000%	  0.209%	     0.000	        0	_retval_output_0_0
+2018-09-10 16:03:31.684021: I tensorflow/core/util/stat_summarizer.cc:85] 
+2018-09-10 16:03:31.684026: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Top by Computation Time ==============================
+2018-09-10 16:03:31.684031: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
+2018-09-10 16:03:31.684041: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   13.153	    3.454	    3.454	  0.024%	  0.024%	   602.112	        0	mixed3b_3x3_pre_relu/conv
+2018-09-10 16:03:31.684051: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.154	    3.185	    3.185	  0.023%	  0.047%	  3211.264	        0	conv2d0_pre_relu/conv
+2018-09-10 16:03:31.684062: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    4.790	    2.886	    2.886	  0.020%	  0.067%	  2408.448	        0	conv2d2_pre_relu/conv
+2018-09-10 16:03:31.684072: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   13.101	    2.512	    2.512	  0.018%	  0.085%	   301.056	        0	mixed3b_5x5_pre_relu/conv
+2018-09-10 16:03:31.684085: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   10.259	    1.601	    1.601	  0.011%	  0.097%	   401.408	        0	mixed3a_3x3_pre_relu/conv
+2018-09-10 16:03:31.684094: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   12.075	    1.576	    1.576	  0.011%	  0.108%	   401.408	        0	mixed3b_1x1_pre_relu/conv
+2018-09-10 16:03:31.684104: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	    7.903	    1.459	    1.459	  0.010%	  0.118%	  2408.448	        0	localresponsenorm1
+2018-09-10 16:03:31.684115: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   10.013	    1.208	    1.208	  0.009%	  0.127%	   100.352	        0	mixed3a_5x5_pre_relu/conv
+2018-09-10 16:03:31.684124: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   12.557	    0.766	    0.766	  0.005%	  0.132%	   200.704	        0	mixed3b_pool_reduce_pre_relu/conv
+2018-09-10 16:03:31.684133: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	   13.662	    0.696	    0.696	  0.005%	  0.137%	     0.000	        0	mixed3b_1x1_pre_relu
+2018-09-10 16:03:31.684141: I tensorflow/core/util/stat_summarizer.cc:85] 
+2018-09-10 16:03:31.684146: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Top by Memory Use ==============================
+2018-09-10 16:03:31.684151: I tensorflow/core/util/stat_summarizer.cc:85] 	             [node type]	  [start]	  [first]	 [avg ms]	     [%]	  [cdf%]	  [mem KB]	[times called]	[Name]
+2018-09-10 16:03:31.684160: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    0.154	    3.185	    3.185	  0.023%	  0.023%	  3211.264	        0	conv2d0_pre_relu/conv
+2018-09-10 16:03:31.684170: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    4.790	    2.886	    2.886	  0.020%	  0.043%	  2408.448	        0	conv2d2_pre_relu/conv
+2018-09-10 16:03:31.684180: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	    7.903	    1.459	    1.459	  0.010%	  0.053%	  2408.448	        0	localresponsenorm1
+2018-09-10 16:03:31.684188: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   16.695	    0.105	    0.105	  0.001%	  0.054%	  1505.280	        0	mixed3b
+2018-09-10 16:03:31.684198: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	    4.514	    0.180	    0.180	  0.001%	  0.055%	   802.816	        0	conv2d1_pre_relu/conv
+2018-09-10 16:03:31.684207: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	    4.249	    0.256	    0.256	  0.002%	  0.057%	   802.816	        0	localresponsenorm0
+2018-09-10 16:03:31.684215: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	   12.072	    0.478	    0.478	  0.003%	  0.060%	   802.816	        0	mixed3b_pool
+2018-09-10 16:03:31.684224: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	   11.957	    0.103	    0.103	  0.001%	  0.061%	   802.816	        0	mixed3a
+2018-09-10 16:03:31.684234: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	    3.661	    0.581	    0.581	  0.004%	  0.065%	   802.816	        0	maxpool0
+2018-09-10 16:03:31.684244: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	   13.153	    3.454	    3.454	  0.024%	  0.090%	   602.112	        0	mixed3b_3x3_pre_relu/conv
+2018-09-10 16:03:31.684254: I tensorflow/core/util/stat_summarizer.cc:85] 
+2018-09-10 16:03:31.684258: I tensorflow/core/util/stat_summarizer.cc:85] Number of nodes executed: 139
+2018-09-10 16:03:31.684263: I tensorflow/core/util/stat_summarizer.cc:85] ============================== Summary by node type ==============================
+2018-09-10 16:03:31.684268: I tensorflow/core/util/stat_summarizer.cc:85] 	             [Node type]	  [count]	  [avg ms]	    [avg %]	    [cdf %]	  [mem KB]	[times called]
+2018-09-10 16:03:31.684276: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Conv2D	       22	     0.028	    87.500%	    87.500%	 10077.888	        0
+2018-09-10 16:03:31.684284: I tensorflow/core/util/stat_summarizer.cc:85] 	                     LRN	        2	     0.002	     6.250%	    93.750%	  3211.264	        0
+2018-09-10 16:03:31.684292: I tensorflow/core/util/stat_summarizer.cc:85] 	                 MaxPool	        6	     0.001	     3.125%	    96.875%	  3562.496	        0
+2018-09-10 16:03:31.684303: I tensorflow/core/util/stat_summarizer.cc:85] 	                 BiasAdd	       24	     0.001	     3.125%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684310: I tensorflow/core/util/stat_summarizer.cc:85] 	                 _Retval	        1	     0.000	     0.000%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684318: I tensorflow/core/util/stat_summarizer.cc:85] 	                    _Arg	        1	     0.000	     0.000%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684328: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Softmax	        1	     0.000	     0.000%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684335: I tensorflow/core/util/stat_summarizer.cc:85] 	                 Reshape	        1	     0.000	     0.000%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684343: I tensorflow/core/util/stat_summarizer.cc:85] 	                    Relu	       23	     0.000	     0.000%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684351: I tensorflow/core/util/stat_summarizer.cc:85] 	                    NoOp	        1	     0.000	     0.000%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684359: I tensorflow/core/util/stat_summarizer.cc:85] 	                  MatMul	        2	     0.000	     0.000%	   100.000%	     8.128	        0
+2018-09-10 16:03:31.684367: I tensorflow/core/util/stat_summarizer.cc:85] 	                Identity	        1	     0.000	     0.000%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684378: I tensorflow/core/util/stat_summarizer.cc:85] 	                   Const	       50	     0.000	     0.000%	   100.000%	     0.000	        0
+2018-09-10 16:03:31.684386: I tensorflow/core/util/stat_summarizer.cc:85] 	                  Concat	        3	     0.000	     0.000%	   100.000%	  2706.368	        0
+2018-09-10 16:03:31.684395: I tensorflow/core/util/stat_summarizer.cc:85] 	                 AvgPool	        1	     0.000	     0.000%	   100.000%	    32.512	        0
+2018-09-10 16:03:31.684403: I tensorflow/core/util/stat_summarizer.cc:85] 
+2018-09-10 16:03:31.684407: I tensorflow/core/util/stat_summarizer.cc:85] Timings (microseconds): count=573 first=29600 curr=24149 min=21413 max=33478 avg=24661.1 std=1769
+2018-09-10 16:03:31.684413: I tensorflow/core/util/stat_summarizer.cc:85] Memory (bytes): count=573 curr=19598656(all same)
+2018-09-10 16:03:31.684418: I tensorflow/core/util/stat_summarizer.cc:85] 139 nodes observed
+2018-09-10 16:03:31.684422: I tensorflow/core/util/stat_summarizer.cc:85] 
 ```
