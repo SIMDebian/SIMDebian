@@ -17,6 +17,12 @@ The workflow is based on `git-buildpackage`. The three branchs from upstream (`m
 should not be modified. We make modifications on the `simd` branch, and append `+simd` to the debian revision number.
 Alternatively, the `simd` mark can be replaced by specific ISA names e.g. `avx`, `avx2`, `neon`, etc. when that makes sense.
 
+#### SIMDebian Archive
+
+https://github.com/SIMDebian/pool-lfs
+
+Using git-lfs and reprepro.
+
 ## Benchmakrs
 
 To proof this project is useful we need some benchmark data.
