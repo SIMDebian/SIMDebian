@@ -19,9 +19,7 @@ Alternatively, the `simd` mark can be replaced by specific ISA names e.g. `avx`,
 
 #### SIMDebian Archive
 
-https://github.com/SIMDebian/pool-lfs
-
-Using git-lfs and reprepro.
+Currently there is only source repos. No pre-built binary packages.
 
 ## Benchmakrs
 
