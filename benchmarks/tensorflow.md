@@ -33,6 +33,18 @@ Machine (osuosl)
 
 Source changes
 ```
+diff --git a/debian/rules b/debian/rules
+index 53b186ef..130196c6 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -1,7 +1,7 @@
+ #!/usr/bin/make -f
+ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+ export DEB_CFLAGS_MAINT_APPEND =
+-export DEB_CXXFLAGS_MAINT_APPEND =
++export DEB_CXXFLAGS_MAINT_APPEND = -mcpu=native
+ # XXX: Warning: -Wl,--as-needed will trigger FTBFS!!
+ export DEB_LDFLAGS_MAINT_APPEND =
 ```
 
 Generic result
