@@ -11,7 +11,7 @@ won't obtain any benifit from modern CPUs' SIMD instruction sets.
 The baseline of SIMDebian has been bumped to:
 * `amd64`: `SSE2` -> `AVX2`
 
-## Project Workflow
+## Project Workflow (Draft)
 
 The workflow is based on `git-buildpackage`. The three branchs from upstream (`master`, `upstream`, `pristine-tar`)
 should not be modified. We make modifications on the `simd` branch, and append `+simd` to the debian revision number.
@@ -21,7 +21,7 @@ Alternatively, the `simd` mark can be replaced by specific ISA names e.g. `avx`,
 
 Currently there is only source repos. No pre-built binary packages.
 
-## Benchmakrs
+## [Benchmakrs](./benchmarks)
 
 To proof this project is useful we need some benchmark data.
 
