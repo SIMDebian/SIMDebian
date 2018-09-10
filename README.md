@@ -1,5 +1,7 @@
 # SIMDebian (experimental)
 
+Project status: [still doing initialization works](https://github.com/SIMDebian/SIMDebian/issues/1)
+
 ## Project Background
 
 In order to keep a good compatibility across different divices, Debian's ISA baseline is very low.
