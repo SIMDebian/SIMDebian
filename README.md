@@ -20,6 +20,17 @@ However, not every package would gain a performance boost after recompiling
 with native machine code. Therefore SIMDebian only rebuild a set of
 selected packages which would benefit from vectorized code to rebuild.
 
+## SIMDebian Archive
+
+https://repo.debiancn.org/simdebian/
+
+Currently supported machine types: `nehalem`, `haswell`, `skylake`.
+
+Example APT configuration:
+```
+deb https://repo.debiancn.org/simdebian/skylake sid main contrib non-free
+```
+
 ## Project Guideline (Draft)
 
 #### Principle
@@ -34,16 +45,6 @@ The workflow is based on `git-buildpackage`. The three branchs from upstream (`m
 should not be modified. We make modifications on the `simd` branch, and append `+simd` to the debian revision number.
 Alternatively, the `simd` mark can be replaced by specific ISA names e.g. `avx`, `avx2`, `neon`, etc. when that makes sense.
 
-#### SIMDebian Archive
-
-https://repo.debiancn.org/simdebian/
-
-Currently supported machine types: `nehalem`, `haswell`, `skylake`.
-
-Example APT configuration:
-```
-deb https://repo.debiancn.org/simdebian/skylake sid main contrib non-free
-```
 
 ## [Benchmakrs](./benchmarks)
 
