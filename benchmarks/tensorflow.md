@@ -26,6 +26,11 @@ Results
 
 | CPU | Compiler | Average Timing (Generic `-O2`) (µs) | Average Timing (Opt `march=native`) (µs) | Boost |
 | --- | --- | --- | --- | --- |
-| I5-7440HQ (4C4T @ 2.8~3.8GHz, AVX2) | GCC-8 (Debian 8.2.0-6) | 66953.4 ± 3017 | 24661.1 ± 1769 | 2.71x |
+| I5-7440HQ (4C4T @ 2.8~3.8GHz, AVX2) | GCC (Debian 8.2.0-6) | 66953.4 ± 3017 | 24661.1 ± 1769 | 2.71x |
+| I5-7440HQ (4C4T @ 2.8~3.8GHz, AVX2) | Clang 7.0.0-+rc2-1~exp3 (tags/RELEASE_700/rc2) | n/a | n/a | n/a |
 
 CPU details: https://ark.intel.com/
+
+### See also
+
+1. https://github.com/soumith/convnet-benchmarks
