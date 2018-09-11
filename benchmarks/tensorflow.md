@@ -11,9 +11,10 @@ dynamically select code according to the CPU.
 ### [amd64/CPU] generic code / native code, inception5h
 
 Source and data
-> https://salsa.debian.org/science-team/tensorflow  
-> b7252d13d59ebecae7928daa25af3a5ab1289bae
-> https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip
+
+* Git Repo: https://salsa.debian.org/science-team/tensorflow  
+  - Commit: b7252d13d59ebecae7928daa25af3a5ab1289bae  
+* Data: https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip  
 
 Benchmark Procedure
 
