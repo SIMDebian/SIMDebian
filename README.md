@@ -1,15 +1,24 @@
 # SIMDebian (experimental)
 
-Project status: [still doing initialization works](https://github.com/SIMDebian/SIMDebian/issues/1)
+Project status: [initialization](https://github.com/SIMDebian/SIMDebian/issues/1)
 
-## Project Background
+## Project Introduction
 
-In order to keep a good compatibility across different divices, Debian's ISA baseline is very low.
-For example, the ISA baseline for amd64 (AKA x86_64) architecture is `<= SSE2` which means we
-won't obtain any benifit from modern CPUs' SIMD instruction sets.
+In order to keep a good compatibility across different divices, Debian's ISA
+baseline is very low. For example, the ISA baseline for `amd64`
+(a.k.a. `x86_64`) architecture is `<= SSE2` which means we won't benefit
+from modern CPUs' SIMD instruction sets.
 
-The baseline of SIMDebian has been bumped to:
-* `amd64`: `SSE2` -> `AVX2`
+To recompile Debian package with SIMD code enabled, the simplest way is to
+inject `-march=native` flag to the compiler flags and recompile the package.
+However a big amount of repeated work has to be done in order to rebuild
+the whole Debian system. Instead, SIMDebian chose to fork `dpkg` and
+directly add the corresponding flag to system default flag list, such
+that we can rebuild any package from Debian without change.
+
+However, not every package would gain a performance boost after recompiling
+with native machine code. Therefore SIMDebian only rebuild a set of
+selected packages which would benefit from vectorized code to rebuild.
 
 ## Project Guideline (Draft)
 
@@ -39,10 +48,11 @@ To proof this project is useful we need some benchmark data.
 
 * Dpkg https://github.com/SIMDebian/dpkg/tree/simd
 
-We forked dpkg to add SIMD buildflag support. With the patched dpkg, one just need to rebuild the debian
-package with the following change:
+We forked dpkg to add SIMD buildflag support. With the patched dpkg, one just
+need to rebuild any Debian package without change to enable new instruction
+sets. Changes to code such as follows are not required.
 
 ```diff
--export DEB_BUILD_MAINT_OPTIONS  = hardening=+all
-+export DEB_BUILD_MAINT_OPTIONS  = hardening=+all simd=+haswell
+-export DEB_CXXFLAGS_MAINT_APPEND =
++export DEB_CXXFLAGS_MAINT_APPEND = -march=native
 ```
