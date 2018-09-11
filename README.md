@@ -36,7 +36,14 @@ Alternatively, the `simd` mark can be replaced by specific ISA names e.g. `avx`,
 
 #### SIMDebian Archive
 
-Currently there is only source repos. No pre-built binary packages.
+https://repo.debiancn.org/simdebian/
+
+Currently supported machine types: `nehalem`, `haswell`, `skylake`.
+
+Example APT configuration:
+```
+deb https://repo.debiancn.org/simdebian/skylake sid main contrib non-free
+```
 
 ## [Benchmakrs](./benchmarks)
 
