@@ -11,7 +11,15 @@ won't obtain any benifit from modern CPUs' SIMD instruction sets.
 The baseline of SIMDebian has been bumped to:
 * `amd64`: `SSE2` -> `AVX2`
 
-## Project Workflow (Draft)
+## Project Guideline (Draft)
+
+#### Principle
+
+Rebuilding all packages with `-march=native` is pointless and wasting
+electricity. SIMDebian aims to a specific set of software that are
+highly valuable to be compiled into vectorized code.
+
+#### Workflow
 
 The workflow is based on `git-buildpackage`. The three branchs from upstream (`master`, `upstream`, `pristine-tar`)
 should not be modified. We make modifications on the `simd` branch, and append `+simd` to the debian revision number.
