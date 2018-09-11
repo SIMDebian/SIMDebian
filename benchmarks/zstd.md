@@ -6,7 +6,8 @@ Zstd test results
 Generic version: `zstd/unstable,unstable,now 1.3.5+dfsg-1`
 Optimized version: `zstd/now 1.3.5+dfsg-1+simd.skylake`
 
-![plot](./zstd.png)
+![plot](./zstd-c.png)
+![plot](./zstd-d.png)
 
 Generic result
 ```
