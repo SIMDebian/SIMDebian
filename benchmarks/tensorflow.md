@@ -1,5 +1,7 @@
-tensorflow test result
+Some TensorFlow Test Results
 ===
+
+### Overview
 
 Unfortunately TF doesn't support runtime code dispatch according
 to CPU capacity. Hence recompiling TF with SIMD enabled is expected
@@ -10,11 +12,12 @@ dynamically select code according to the CPU.
 
 ### [amd64/CPU] generic code / native code, inception5h
 
-Source and data
+Source, Data, Basic Environment
 
 * Git Repo: https://salsa.debian.org/science-team/tensorflow  
   - Commit: b7252d13d59ebecae7928daa25af3a5ab1289bae  
 * Data: https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip  
+* OS: Debian Experimental (2018 Sept)
 
 Benchmark Procedure
 
@@ -29,8 +32,7 @@ Results
 | I5-7440HQ (4C4T @ 2.8~3.8GHz, AVX2) | GCC (Debian 8.2.0-6) | 66953.4 ± 3017 | 24661.1 ± 1769 | 2.71x |
 | I5-7440HQ (4C4T @ 2.8~3.8GHz, AVX2) | Clang 7.0.0-+rc2-1~exp3 (tags/RELEASE_700/rc2) | n/a | n/a | n/a |
 
-CPU details: https://ark.intel.com/
-
-### See also
+### See Also
 
 1. https://github.com/soumith/convnet-benchmarks
+2. CPU details: https://ark.intel.com/
