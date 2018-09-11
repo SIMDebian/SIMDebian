@@ -30,7 +30,7 @@ Results
 | CPU | Compiler | Average Timing (Generic `-O2`) (µs) | Average Timing (Opt `march=native`) (µs) | Boost |
 | --- | --- | --- | --- | --- |
 | I5-7440HQ (4C4T @ 2.8~3.8GHz, AVX2) | GCC (Debian 8.2.0-6) | 66953.4 ± 3017 | 24661.1 ± 1769 | 2.71x |
-| I5-7440HQ (4C4T @ 2.8~3.8GHz, AVX2) | Clang 7.0.0-+rc2-1~exp3 (tags/RELEASE_700/rc2) | n/a | 26324.7 ± 1743 | n/a |
+| I5-7440HQ (4C4T @ 2.8~3.8GHz, AVX2) | Clang 7.0.0-+rc2-1~exp3 (tags/RELEASE_700/rc2) | 49932.8 ± 2550 | 26324.7 ± 1743 | 1.90x |
 
 ### See Also
 
