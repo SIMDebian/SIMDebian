@@ -36,3 +36,7 @@ Results
 
 1. https://github.com/soumith/convnet-benchmarks
 2. CPU details: https://ark.intel.com/
+
+### Copyright
+
+lumin AT debian.org, CC-BY-SA 4.0
