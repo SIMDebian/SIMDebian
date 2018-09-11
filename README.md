@@ -45,6 +45,10 @@ The workflow is based on `git-buildpackage`. The three branchs from upstream (`m
 should not be modified. We make modifications on the `simd` branch, and append `+simd` to the debian revision number.
 Alternatively, the `simd` mark can be replaced by specific ISA names e.g. `avx`, `avx2`, `neon`, etc. when that makes sense.
 
+Candidate version schemes:
+
+* `dpkg/now 1.19.0.5+simd.skylake`
+
 
 ## [Benchmakrs](./benchmarks)
 
