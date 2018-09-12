@@ -76,3 +76,7 @@ sets. Changes to code such as follows are not required.
 -export DEB_CXXFLAGS_MAINT_APPEND =
 +export DEB_CXXFLAGS_MAINT_APPEND = -march=native
 ```
+
+## SIMDebian Developer Reference
+
+https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#x86-Options
