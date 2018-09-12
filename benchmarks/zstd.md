@@ -61,6 +61,35 @@ Benchmarking levels from 1 to 19
 19#Synthetic 50%     :  10000000 ->   3131274 (3.194),  3.05 MB/s ,1194.3 MB/s 
 ```
 
+-march=skylake, -ftree-vectorize
+```
+~/S/z/libzstd-1.3.5+dfsg ❯❯❯ zstd -b1 -e19
+- test >= 3 seconds per compression / decompression - 
+Benchmarking levels from 1 to 19
+ 1#Synthetic 50%     :  10000000 ->   3139167 (3.186), 433.8 MB/s ,1695.5 MB/s 
+ 2#Synthetic 50%     :  10000000 ->   3115142 (3.210), 306.9 MB/s ,1577.0 MB/s 
+ 3#Synthetic 50%     :  10000000 ->   3222676 (3.103), 184.1 MB/s ,1103.6 MB/s 
+ 4#Synthetic 50%     :  10000000 ->   3313085 (3.018), 139.2 MB/s , 929.2 MB/s 
+ 5#Synthetic 50%     :  10000000 ->   3278023 (3.051),  61.4 MB/s , 897.7 MB/s 
+ 6#Synthetic 50%     :  10000000 ->   3311431 (3.020),  60.9 MB/s , 870.0 MB/s 
+ 7#Synthetic 50%     :  10000000 ->   3302083 (3.028),  50.0 MB/s , 874.5 MB/s 
+ 8#Synthetic 50%     :  10000000 ->   3306698 (3.024),  39.7 MB/s , 860.0 MB/s 
+ 9#Synthetic 50%     :  10000000 ->   3310350 (3.021),  34.8 MB/s , 856.3 MB/s 
+10#Synthetic 50%     :  10000000 ->   3313086 (3.018),  24.1 MB/s , 837.3 MB/s 
+11#Synthetic 50%     :  10000000 ->   3313318 (3.018),  19.1 MB/s , 830.0 MB/s 
+12#Synthetic 50%     :  10000000 ->   3344827 (2.990),  23.8 MB/s , 792.1 MB/s 
+13#Synthetic 50%     :  10000000 ->   3343890 (2.991),  13.8 MB/s , 792.3 MB/s 
+14#Synthetic 50%     :  10000000 ->   3343817 (2.991),  13.7 MB/s , 781.9 MB/s 
+15#Synthetic 50%     :  10000000 ->   3343215 (2.991),  11.1 MB/s , 851.4 MB/s 
+16#Synthetic 50%     :  10000000 ->   3067584 (3.260),  9.71 MB/s ,1440.2 MB/s 
+17#Synthetic 50%     :  10000000 ->   3129998 (3.195),  4.26 MB/s ,1202.4 MB/s 
+18#Synthetic 50%     :  10000000 ->   3130748 (3.194),  3.53 MB/s ,1210.2 MB/s 
+19#Synthetic 50%     :  10000000 ->   3131274 (3.194),  2.65 MB/s ,1154.5 MB/s 
+~/S/z/libzstd-1.3.5+dfsg ❯❯❯ apt list zstd
+Listing... Done
+zstd/now 1.3.5+dfsg-1+skylake amd64 [installed,local]
+```
+
 
 ```
 lumin AT debian.org, CC-BY-SA 4.0
