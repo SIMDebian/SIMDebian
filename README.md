@@ -84,3 +84,7 @@ sets. Changes to code such as follows are not required.
 1. https://wiki.gentoo.org/wiki/GCC_optimization
 
 1. https://wiki.gentoo.org/wiki/Safe_CFLAGS
+
+## Join SIMDebian
+
+Simply open an issue and say you want to join!
