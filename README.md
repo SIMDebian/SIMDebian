@@ -20,6 +20,13 @@ However, not every package would gain a performance boost after recompiling
 with native machine code. Therefore SIMDebian only rebuild a set of
 selected packages which would benefit from vectorized code to rebuild.
 
+### ISA Baseline of SIMDebian
+
+* `nehalem` for the first generation supporting SSE4.1
+* (`sandybridge` for the first generation supporting AVX is missing)
+* `haswell` for the first generation supporting AVX2
+* `skylake` for my own cpu (hmm...)
+
 ## SIMDebian Archive
 
 https://repo.debiancn.org/simdebian/
