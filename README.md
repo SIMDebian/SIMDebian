@@ -77,6 +77,8 @@ sets. Changes to code such as follows are not required.
 +export DEB_CXXFLAGS_MAINT_APPEND = -march=native
 ```
 
+* Intel Compiler?
+
 ## SIMDebian Developer Reference
 
 1. https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#x86-Options
