@@ -79,6 +79,8 @@ sets. Changes to code such as follows are not required.
 
 ## SIMDebian Developer Reference
 
-https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#x86-Options
-https://wiki.gentoo.org/wiki/GCC_optimization
-https://wiki.gentoo.org/wiki/Safe_CFLAGS
+1. https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#x86-Options
+
+1. https://wiki.gentoo.org/wiki/GCC_optimization
+
+1. https://wiki.gentoo.org/wiki/Safe_CFLAGS
