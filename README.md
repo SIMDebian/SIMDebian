@@ -29,13 +29,13 @@ selected packages which would benefit from vectorized code to rebuild.
 
 ## SIMDebian Archive
 
-https://sim.debiancn.org/
+http://sim.debiancn.org/
 
 Currently supported machine types: `nehalem`, `haswell`, `skylake`.
 
 Example APT configuration:
 ```
-deb https://sim.debiancn.org/skylake sid main contrib non-free
+deb http://sim.debiancn.org/skylake sid main contrib non-free
 ```
 
 ## Project Guideline (Draft)
