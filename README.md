@@ -54,9 +54,9 @@ Alternatively, the `simd` mark can be replaced by specific ISA names e.g. `avx`,
 
 Candidate version schemes:
 
-* `dpkg/now 1.19.0.5+simd.skylake`
-* `dpkg/now 1.19.0.5+simd.haswell`
-* `dpkg/now 1.19.0.5+simd.nehalem`
+* `dpkg/now 1.19.0.5+skylake`
+* `dpkg/now 1.19.0.5+haswell`
+* `dpkg/now 1.19.0.5+nehalem`
 
 ## [Benchmakrs](./benchmarks)
 
