@@ -4,6 +4,8 @@ Project status: [initialization](https://github.com/SIMDebian/SIMDebian/issues/1
 
 ## Project Introduction
 
+Unleash the TRUE power of your CPU.
+
 In order to keep a good compatibility across different divices, Debian's ISA
 baseline is very low. For example, the ISA baseline for `amd64`
 (a.k.a. `x86_64`) architecture is `<= SSE2` which means we won't benefit
