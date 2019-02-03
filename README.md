@@ -68,7 +68,7 @@ To proof this project is useful we need some benchmark data.
 
 #### Development
 
-* Dpkg https://github.com/SIMDebian/dpkg/tree/simd
+* Dpkg https://github.com/SIMDebian/dpkg/
 
 We forked dpkg to add SIMD buildflag support. With the patched dpkg, one just
 need to rebuild any Debian package without change to enable new instruction
