@@ -89,6 +89,8 @@ sets. Changes to code such as follows are not required.
 
 1. https://wiki.gentoo.org/wiki/Safe_CFLAGS
 
+1. https://lists.debian.org/debian-devel/2019/04/msg00057.html
+
 
 ## Join SIMDebian
 
