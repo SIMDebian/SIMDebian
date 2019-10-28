@@ -60,7 +60,7 @@ Candidate version schemes:
 * `dpkg/now 1.19.0.5+haswell`
 * `dpkg/now 1.19.0.5+nehalem`
 
-## [Benchmakrs](./benchmarks)
+## [Benchmarks](./benchmarks)
 
 To proof this project is useful we need some benchmark data.
 
